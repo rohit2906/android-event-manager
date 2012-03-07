@@ -31,7 +31,6 @@ public class LoginActivity extends Activity implements OnClickListener {
 		case R.id.loginBtnOtherAccount:
 			startActivity(new Intent(this, CredentialsActivity.class));
 			break;
-
 		default:
 			break;
 		}
