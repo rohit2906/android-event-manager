@@ -2,9 +2,13 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
+        android:id="@+id/menuItemSyncNow"
+        android:icon="@drawable/ic_menu_refresh"
+        android:title="@string/menuItemSyncNowText" />
+    
+    <item
         android:id="@+id/menuItemPreferences"
-        android:icon="@android:drawable/ic_menu_preferences"
-        android:title="@string/menuItemPreferencesText"
-        android:titleCondensed="@string/menuItemPreferencesTextCondensed"/>
-
+        android:icon="@drawable/ic_menu_preferences"
+        android:title="@string/menuItemPreferencesText" />
+    
 </menu>

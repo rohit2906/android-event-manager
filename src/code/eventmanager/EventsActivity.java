@@ -18,7 +18,7 @@ public class EventsActivity extends Activity implements OnClickListener, OnShare
 	private static final String TAG = "EventsActivity";
 	
 	Button buttonNewEvent;
-
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
