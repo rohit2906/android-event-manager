@@ -8,7 +8,8 @@
         android:id="@+id/textView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/new_event_title_text"
+        android:text="@string/neweventTitleText"
+        android:layout_gravity="center"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
 </LinearLayout>
