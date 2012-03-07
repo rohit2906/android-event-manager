@@ -3,6 +3,14 @@
 
     <string name="hello">Hello World, EventManagerActivity!</string>
     <string name="app_name">EventManager</string>
+    <string name="loginBtnLoginText">Login with your Google account</string>
+    <string name="loginBtnOtherAccountText">Login using another Google account</string>
+    <string name="loginTvLoginText">Login</string>
+    <string name="credentialsTvUsernameText">Username</string>
+    <string name="credentialsTvPasswordText">Password</string>
+    <string name="credentialsBtnLoginText">Login</string>
+    <dimen name="credentialsEtUsernameWidth">200dp</dimen>
+    <dimen name="credentialsEtPasswordWidth">150dp</dimen>
     <string name="neweventTitleText">New Event</string>
 
 </resources>
