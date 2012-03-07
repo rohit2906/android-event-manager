@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <string name="hello">Hello World, EventManagerActivity!</string>
-    <string name="app_name">EventManager</string>
+    <string name="appName">Event Manager</string>
     <string name="loginBtnLoginText">Login with your Google account</string>
     <string name="loginBtnOtherAccountText">Login using another Google account</string>
     <string name="loginTvLoginText">Login</string>
@@ -12,5 +10,11 @@
     <dimen name="credentialsEtUsernameWidth">200dp</dimen>
     <dimen name="credentialsEtPasswordWidth">150dp</dimen>
     <string name="neweventTitleText">New Event</string>
+    <string name="eventsTitleText">Upcoming Events</string>
+    <string name="eventsButtonNewEventText">New Event</string>
+    <string name="menuItemPreferencesText">Preferences</string>
+    <string name="menuItemPreferencesTextCondensed">Prefs</string>
+    <string name="eventsTitle">Upcoming Events</string>
+    <string name="preferencesTitle">Preferences</string>
 
 </resources>
