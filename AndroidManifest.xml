@@ -10,16 +10,22 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/appName" >
         <activity
-            android:name=".EventManagerActivity"
-            android:label="@string/appName" >
+            android:name=".LoginActivity"
+            android:label="@string/loginTitle" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".EventsActivity"></activity>
-        <activity android:name=".PreferencesActivity" android:label="@string/preferencesTitle"></activity>
+        <activity
+            android:name=".CredentialsActivity"
+            android:label="@string/credentialsTitle" >
+        </activity>
+        <activity
+            android:name=".PreferencesActivity"
+            android:label="@string/preferencesTitle" >
+        </activity>
     </application>
 
 </manifest>

@@ -16,5 +16,7 @@
     <string name="menuItemPreferencesTextCondensed">Prefs</string>
     <string name="eventsTitle">Upcoming Events</string>
     <string name="preferencesTitle">Preferences</string>
+    <string name="loginTitle">Login</string>
+    <string name="credentialsTitle">Credentials</string>
 
 </resources>
