@@ -3,23 +3,6 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent" >
 
-    <Button
-        android:id="@+id/loginBtnLogin"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:text="@string/loginBtnLoginText" />
-
-    <Button
-        android:id="@+id/loginBtnOtherAccount"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/button1"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="39dp"
-        android:text="@string/loginBtnOtherAccountText" />
-
     <TextView
         android:id="@+id/loginTvLogin"
         android:layout_width="wrap_content"
@@ -29,5 +12,23 @@
         android:layout_marginTop="52dp"
         android:text="@string/loginTvLoginText"
         android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <Button
+        android:id="@+id/loginBtnLogin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/loginTvLogin"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="108dp"
+        android:text="@string/loginBtnLoginText" />
+
+    <Button
+        android:id="@+id/loginBtnOtherAccount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/loginBtnLogin"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="40dp"
+        android:text="@string/loginBtnOtherAccountText" />
 
 </RelativeLayout>
