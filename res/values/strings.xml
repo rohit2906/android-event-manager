@@ -3,6 +3,6 @@
 
     <string name="hello">Hello World, EventManagerActivity!</string>
     <string name="app_name">EventManager</string>
-    <string name="new_event_title_text">New Event</string>
+    <string name="neweventTitleText">New Event</string>
 
 </resources>
