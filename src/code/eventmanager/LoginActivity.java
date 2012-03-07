@@ -26,6 +26,7 @@ public class LoginActivity extends Activity implements OnClickListener {
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.loginBtnLogin:
+			startService(new Intent(this, PollerService.class));
 			startActivity(new Intent(this, EventsActivity.class));
 			break;
 		case R.id.loginBtnOtherAccount:

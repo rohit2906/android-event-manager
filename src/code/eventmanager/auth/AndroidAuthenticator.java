@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.prasanta.auth;
+package code.eventmanager.auth;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
@@ -31,7 +31,6 @@ import com.pras.auth.Authenticator;
  * @author Prasanta Paul
  */
 public class AndroidAuthenticator implements Authenticator {
-
 	private final String TAG = "AndroidAuthenticator";
 	Activity activity;
 	AccountManager manager;
