@@ -8,11 +8,14 @@ import android.preference.PreferenceManager;
 
 public class EventManagerActivity extends Activity {
 
+	@SuppressWarnings("unused")
+	private static final String TAG = "EventManagerActivity";
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(this);
-		if(prefs.getString("username", "").equalsIgnoreCase("") || prefs.getString("password", "").equalsIgnoreCase(""))
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		if (prefs.getString("username", "").equalsIgnoreCase("") || prefs.getString("password", "").equalsIgnoreCase(""))
 			startActivity(new Intent(this, LoginActivity.class));
 		else
 			startActivity(new Intent(this, EventsActivity.class));

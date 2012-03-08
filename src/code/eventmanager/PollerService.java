@@ -107,7 +107,7 @@ public class PollerService extends Service implements OnSharedPreferenceChangeLi
 					spreadsheetFactory = SpreadSheetFactory.getInstance(email, password);
 				}
 
-				sleeptime = preferences.getInt("pollerUpdateTime", 60) * 6000;
+				sleeptime = preferences.getInt("pollerMinutesBetweenUpdates", 1) * 60000;
 				spreadsheetTitle = preferences.getString("PollerSpreadsheetTitle", "");
 			}
 			return spreadsheetFactory;
