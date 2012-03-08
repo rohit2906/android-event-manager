@@ -19,5 +19,6 @@
     
     <dimen name="credentialsEtUsernameWidth">200dp</dimen>
     <dimen name="credentialsEtPasswordWidth">150dp</dimen>
+    <string name="pollerTitle">PollerService</string>
 
 </resources>

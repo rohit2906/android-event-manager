@@ -11,6 +11,9 @@ import android.widget.Toast;
 
 public class CredentialsActivity extends Activity implements OnClickListener {
 
+	@SuppressWarnings("unused")
+	private static final String TAG = "CredentialsActivity";
+	
 	Button btnLogin;
 	EditText etUsername;
 	EditText etPassword;
