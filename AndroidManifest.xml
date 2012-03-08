@@ -12,17 +12,23 @@
 
     <application
         android:icon="@drawable/ic_launcher"
-        android:label="@string/appName" >
-        <activity
-            android:name=".LoginActivity"
-            android:label="@string/appName" >
+        android:label="@string/eventManagerTitle" >
+         <activity
+             android:noHistory="true"
+            android:name=".EventManagerActivity"
+            android:label="@string/eventManagerTitle" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
+            android:noHistory="true"
+            android:name=".LoginActivity"
+            android:label="@string/loginTitle" >
+        </activity>
+        <activity
+            android:noHistory="true"
             android:name=".CredentialsActivity"
             android:label="@string/credentialsTitle" >
         </activity>

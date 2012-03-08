@@ -35,7 +35,7 @@ public class CredentialsActivity extends Activity implements OnClickListener {
 			else if( etPassword.getText().toString().equalsIgnoreCase(""))
 				Toast.makeText(this, "Write your password ", Toast.LENGTH_LONG).show();
 		else{
-			startService(new Intent(this, PollerService.class));
+			//TODO startService(new Intent(this, PollerService.class));
 			startActivity(new Intent(this, EventsActivity.class));
 		}
 			

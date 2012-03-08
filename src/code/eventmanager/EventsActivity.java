@@ -22,6 +22,7 @@ public class EventsActivity extends Activity implements OnClickListener, OnShare
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
 		setContentView(R.layout.events_layout);
 		
 		buttonNewEvent = (Button) findViewById(R.id.eventsButtonNewEvent);
