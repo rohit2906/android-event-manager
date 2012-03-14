@@ -1,4 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 
+    <CheckBoxPreference
+        android:disableDependentsState="true"
+        android:enabled="true"
+        android:key="useDefaultAccount"
+        android:summary="@string/preferencesUseDefaultAccountSummary"
+        android:title="@string/preferencesUseDefaultAccountText" />
+
+    <EditTextPreference
+        android:dependency="useDefaultAccount"
+        android:key="customAccountEmail"
+        android:summary="@string/preferencesOtherAccountEmailSummary"
+        android:title="@string/preferencesOtherAccountEmailText" >
+    </EditTextPreference>
+    
+    <EditTextPreference
+        android:dependency="useDefaultAccount"
+        android:key="customAccountPassword"
+        android:password="true"
+        android:summary="@string/preferencesOtherAccountPasswordSummary"
+        android:title="@string/preferencesOtherAccountPasswordText" >
+    </EditTextPreference>
+
+    <ListPreference
+        android:defaultValue="60"
+        android:entries="@array/minutesBetweenUpdatesString"
+        android:entryValues="@array/minutesBetweenUpdatesValues"
+        android:key="minutesBetweenUpdates"
+        android:summary="@string/preferencesMinutesBetweenUpdatesSummary"
+        android:title="@string/preferencesMinutesBetweenUpdatesText" />
+
+    <EditTextPreference
+        android:defaultValue="event_manager"
+        android:key="spreadsheetTitle"
+        android:summary="@string/preferencesSpreadsheetTitleText"
+        android:title="@string/preferencesSpreadsheetTitleSummary" >
+    </EditTextPreference>
+
 </PreferenceScreen>
