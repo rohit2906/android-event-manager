@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    
+
+    <dimen name="credentialsEtUsernameWidth">200dp</dimen>
+    <dimen name="credentialsEtPasswordWidth">150dp</dimen>
+
     <string name="eventManagerTitle">Event Manager</string>
     <string name="loginTitle">Login</string>
     <string name="loginBtnLoginText">Login with your Google account</string>
@@ -17,9 +20,16 @@
     <string name="eventsTitle">Upcoming Events</string>
     <string name="preferencesTitle">Preferences</string>
     <string name="credentialsTitle">Credentials</string>
-    
-    <dimen name="credentialsEtUsernameWidth">200dp</dimen>
-    <dimen name="credentialsEtPasswordWidth">150dp</dimen>
     <string name="pollerTitle">PollerService</string>
+    <string name="preferencesUseDefaultAccountText">Default Google Account</string>
+    <string name="preferencesUseDefaultAccountSummary">Use your mobile\'s Google Account</string>
+    <string name="preferencesOtherAccountEmailText">E-mail</string>
+    <string name="preferencesOtherAccountEmailSummary">Google Account\'s Email</string>
+    <string name="preferencesOtherAccountPasswordText">Password</string>
+    <string name="preferencesOtherAccountPasswordSummary">Google Account\'s Password</string>
+    <string name="preferencesMinutesBetweenUpdatesText">Update Time</string>
+    <string name="preferencesMinutesBetweenUpdatesSummary">Automatic updates frequency</string>
+    <string name="preferencesSpreadsheetTitleText">Spreadsheet Title</string>
+    <string name="preferencesSpreadsheetTitleSummary">Name of the spreadsheet to check</string>
 
 </resources>

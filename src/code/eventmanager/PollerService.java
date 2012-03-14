@@ -51,9 +51,10 @@ public class PollerService extends Service implements OnSharedPreferenceChangeLi
 		thread.start();
 		return super.onStartCommand(intent, flags, startId);
 	}
-
+	
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences arg0, String arg1) {
+		Log.v(TAG, "onSharedPreferenceChanged");
 		spreadsheetFactory = null;
 	}
 
@@ -99,16 +100,18 @@ public class PollerService extends Service implements OnSharedPreferenceChangeLi
 		private SpreadSheetFactory getSpreadsheetFactory() {
 			if (spreadsheetFactory == null) {
 
-				if (preferences.getBoolean("pollerUseDefaultAccount", true)) {
+				if (preferences.getBoolean("useDefaultAccount", true)) {
+					Log.v(TAG, "Logging in with default account.");
 					spreadsheetFactory = SpreadSheetFactory.getInstance(new AndroidAuthenticator(getApplicationContext()));
 				} else {
-					String email = preferences.getString("pollerOtherAccountEmail", "");
-					String password = preferences.getString("pollerOtherAccountPassword", "");
+					Log.v(TAG, "Logging in with custom account.");
+					String email = preferences.getString("customAccountEmail", "");
+					String password = preferences.getString("customAccountPassword", "");
 					spreadsheetFactory = SpreadSheetFactory.getInstance(email, password);
 				}
 
-				sleeptime = preferences.getInt("pollerMinutesBetweenUpdates", 1) * 60000;
-				spreadsheetTitle = preferences.getString("PollerSpreadsheetTitle", "");
+				sleeptime = Integer.parseInt(preferences.getString("minutesBetweenUpdates", "60")) * 60000;
+				spreadsheetTitle = preferences.getString("spreadsheetTitle", "");
 			}
 			return spreadsheetFactory;
 		}
