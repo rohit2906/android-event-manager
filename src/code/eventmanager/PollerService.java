@@ -9,6 +9,7 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
+
 import code.eventmanager.auth.AndroidAuthenticator;
 
 import com.pras.SpreadSheet;
