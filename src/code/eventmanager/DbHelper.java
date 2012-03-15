@@ -11,7 +11,7 @@ public class DbHelper extends SQLiteOpenHelper {
 	static final String DB_NAME = "events.db";
 	static final int DB_VERSION = 1;
 	static final String TABLE_EVENTS = "events";
-	static final String C = "attendings";
+	static final String TABLE_ATTENDINGS = "attendings";
 	static final String EVENTS_ID = BaseColumns._ID;
 	static final String EVENTS_NAME = "name";
 	static final String EVENTS_DESCRIPTION = "description";
@@ -28,15 +28,15 @@ public class DbHelper extends SQLiteOpenHelper {
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 		String sql;
-		sql = "create table " + TABLE_EVENTS + " (" + EVENTS_ID
-				+ " integer primary key autoincrement, " + EVENTS_NAME
-				+ " text, " + EVENTS_DESCRIPTION + " text, " + EVENTS_CREATOR
-				+ " text" + EVENTS_STARTING_TS + " integer, "
-				+ EVENTS_ENDING_TS + " integer)";
+		sql = "CREATE TABLE " + TABLE_EVENTS + " (" + EVENTS_ID
+				+ " integer NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, " + EVENTS_NAME
+				+ " text NOT NULL, " + EVENTS_DESCRIPTION + " text, " + EVENTS_CREATOR
+				+ " text NOT NULL" + EVENTS_STARTING_TS + " integer NOT NULL, "
+				+ EVENTS_ENDING_TS + " integer NOT NULL)";
 		db.execSQL(sql);
 		Log.d(TAG, "onCreated sql: " + sql);
-		sql = "create table " + TABLE_EVENTS + " (" + ATTENDINGS_EVENT_ID
-				+ " integer, " + ATTENDINGS_EMAILS + " text)";
+		sql = "CREATE TABLE " + TABLE_ATTENDINGS + " (" + ATTENDINGS_EVENT_ID
+				+ " integer NOT NULL REFERENCES " + TABLE_EVENTS + "(" + EVENTS_ID + ") ON DELETE CASCADE ON UPDATE CASCADE, " + ATTENDINGS_EMAILS + " text NOT NULL,PRIMARY KEY (ID_events,Mails))";
 		db.execSQL(sql);
 		Log.d(TAG, "onCreated sql: " + sql);
 	}
