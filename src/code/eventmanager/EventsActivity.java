@@ -49,7 +49,7 @@ public class EventsActivity extends Activity implements OnClickListener, OnShare
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.eventsButtonNewEvent:
-			startActivity(new Intent(this, NeweventActivity.class));
+			startActivity(new Intent(this, NewEventActivity.class));
 			break;
 		}
 	}
