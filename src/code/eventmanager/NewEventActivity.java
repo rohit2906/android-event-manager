@@ -3,10 +3,10 @@ package code.eventmanager;
 import android.app.Activity;
 import android.os.Bundle;
 
-public class NeweventActivity extends Activity {
+public class NewEventActivity extends Activity {
 	
 	@SuppressWarnings("unused")
-	private static final String TAG = "NeweventActivity";
+	private static final String TAG = NewEventActivity.class.getSimpleName();
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {

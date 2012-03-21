@@ -7,9 +7,10 @@ import android.provider.BaseColumns;
 import android.util.Log;
 
 public class DbHelper extends SQLiteOpenHelper {
-	static final String TAG = "DbHelper";
+	private static final String TAG = DbHelper.class.getSimpleName();
+	
 	static final String DB_NAME = "events.db";
-	static final int DB_VERSION = 1;
+	static int DB_VERSION = 1;
 	static final String TABLE_EVENTS = "events";
 	static final String TABLE_ATTENDINGS = "attendings";
 	static final String EVENTS_ID = BaseColumns._ID;
@@ -42,6 +43,11 @@ public class DbHelper extends SQLiteOpenHelper {
 	}
 
 	@Override
-	public void onUpgrade(SQLiteDatabase arg0, int arg1, int arg2) {
+	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+		db.execSQL("drop table if exists " + TABLE_ATTENDINGS);
+		db.execSQL("drop table if exists " + TABLE_EVENTS);
+	    Log.d(TAG, "onUpdated");
+	    onCreate(db);
+	    DB_VERSION = newVersion;
 	}
 }
