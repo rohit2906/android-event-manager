@@ -40,6 +40,10 @@
             android:name=".EventsActivity"
             android:label="@string/eventsTitle" >
         </activity>
+        <activity
+            android:name=".NeweventActivity"
+            android:label="@string/neweventTitle" >
+        </activity>
         <service android:name=".PollerService" android:label="@string/pollerTitle"></service>
     </application>
 

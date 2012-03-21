@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    
+
     <string-array name="minutesBetweenUpdatesString">
         <item>1  minute</item>
         <item>15 minutes</item>
@@ -30,5 +30,5 @@
         <item>43200</item>
         <item>525600</item>
     </string-array>
-    
+
 </resources>
