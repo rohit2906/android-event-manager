@@ -1,26 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <dimen name="credentialsEtUsernameWidth">200dp</dimen>
-    <dimen name="credentialsEtPasswordWidth">150dp</dimen>
-
+    
     <string name="eventManagerTitle">Event Manager</string>
+    
     <string name="loginTitle">Login</string>
     <string name="loginBtnLoginText">Login with your Google account</string>
     <string name="loginBtnOtherAccountText">Login using another Google account</string>
     <string name="loginTvLoginText">Login</string>
+    
+    <string name="credentialsTitle">Credentials</string>
     <string name="credentialsTvUsernameText">Username</string>
     <string name="credentialsTvPasswordText">Password</string>
     <string name="credentialsBtnLoginText">Login</string>
-    <string name="neweventTitleText">New Event</string>
+    
+    <string name="neweventTitle">New Event</string>
+    <string name="neweventTextViewNewEventText">New Event</string>
+    <string name="neweventTextViewTitleText">Title</string>
+    <string name="neweventTextViewStartingDateText">Starting Date</string>
+    <string name="neweventTextViewStartingHourText">Starting Hour</string>
+    <string name="neweventTextViewEndingDateText">Ending Date</string>
+    <string name="neweventTextViewEndingHourText">Ending Hour</string>
+    
+    <string name="eventsTitle">Upcoming Events</string>
     <string name="eventsTitleText">Upcoming Events</string>
     <string name="eventsButtonNewEventText">New Event</string>
+    
     <string name="menuItemPreferencesText">Preferences</string>
     <string name="menuItemSyncNowText">Sync Now</string>
-    <string name="eventsTitle">Upcoming Events</string>
+    
     <string name="preferencesTitle">Preferences</string>
-    <string name="credentialsTitle">Credentials</string>
-    <string name="pollerTitle">PollerService</string>
     <string name="preferencesUseDefaultAccountText">Default Google Account</string>
     <string name="preferencesUseDefaultAccountSummary">Use your mobile\'s Google Account</string>
     <string name="preferencesOtherAccountEmailText">E-mail</string>
@@ -31,5 +39,7 @@
     <string name="preferencesMinutesBetweenUpdatesSummary">Automatic updates frequency</string>
     <string name="preferencesSpreadsheetTitleText">Spreadsheet Title</string>
     <string name="preferencesSpreadsheetTitleSummary">Name of the spreadsheet to check</string>
+    
+    <string name="pollerTitle">PollerService</string>
 
 </resources>

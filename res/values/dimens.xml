@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="credentialsEtUsernameWidth">200dp</dimen>
+    <dimen name="credentialsEtPasswordWidth">150dp</dimen>
+    <dimen name="neweventEditTextDimensionWidth">280dp</dimen>
+    <dimen name="neweventTextViewDimensionMarginTop">15dp</dimen>
+    <dimen name="neweventTextViewDimensionMarginLeft">20dp</dimen>
+
+</resources>
