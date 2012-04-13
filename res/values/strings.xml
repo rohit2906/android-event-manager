@@ -12,6 +12,12 @@
     <string name="credentialsTvUsernameText">Username</string>
     <string name="credentialsTvPasswordText">Password</string>
     <string name="credentialsBtnLoginText">Login</string>
+    <string name="credentialsKeyDefaultAccount">useDefaultAccount</string>
+    <string name="credentialsKeySpreadsheetTitle">spreadsheetTitle</string>
+    <string name="credentialsKeyMinutesBetweenUpdates">minutesBetweenUpdates</string>
+    <string name="credentialsKeyCustomAccountPassword">customAccountPassword</string>
+    <string name="credentialsKeyCustomAccountMail">customAccountEmail</string>
+    
     
     <string name="neweventTitle">New Event</string>
     <string name="neweventTextViewNewEventText">New Event</string>
