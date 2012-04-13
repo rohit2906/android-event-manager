@@ -1,62 +1,52 @@
 package code.eventmanager;
 
 import java.util.ArrayList;
-
 import android.app.Service;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.IBinder;
-import android.preference.PreferenceManager;
 import android.util.Log;
-
-import code.eventmanager.auth.AndroidAuthenticator;
-
 import com.pras.SpreadSheet;
-import com.pras.SpreadSheetFactory;
 
-public class PollerService extends Service implements OnSharedPreferenceChangeListener {
+public class PollerService extends Service {
 
-	private final String TAG = "PollerService";
+	private static final String TAG = PollerService.class.getSimpleName();
 
 	private Poller thread;
-	private SharedPreferences preferences;
-	private SpreadSheetFactory spreadsheetFactory;
+	private EventManagerApp app;
 	private String spreadsheetTitle;
 	private int sleeptime;
 
+	/**
+	 * Instance the thread
+	 */
 	@Override
 	public void onCreate() {
-		super.onCreate();
+		app = (EventManagerApp) getApplication();
 		Log.v(TAG, "onCreate");
-
-		preferences = PreferenceManager.getDefaultSharedPreferences(this);
-		preferences.registerOnSharedPreferenceChangeListener(this);
-
-		spreadsheetFactory = null;
 		thread = new Poller();
 	}
 
+	/**
+	 * Stop the thread and destroy the service
+	 */
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
 		Log.v(TAG, "onDestroy");
 		thread.stopThread();
-		thread.interrupt();
+		thread.interrupt(); // With only interrupt the thread could continue to
+							// run
 		thread = null;
 	}
 
+	/**
+	 * Start the thread
+	 */
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		Log.v(TAG, "onStartCommand");
 		thread.start();
 		return super.onStartCommand(intent, flags, startId);
-	}
-	
-	@Override
-	public void onSharedPreferenceChanged(SharedPreferences arg0, String arg1) {
-		Log.v(TAG, "onSharedPreferenceChanged");
-		spreadsheetFactory = null;
 	}
 
 	@Override
@@ -66,23 +56,36 @@ public class PollerService extends Service implements OnSharedPreferenceChangeLi
 
 	private class Poller extends Thread {
 
-		private final String TAG = "Poller";
+		final String TAG = Poller.class.getSimpleName();
 		private volatile boolean running;
 
+		/**
+		 * Instance the thread without start it
+		 */
 		public Poller() {
 			super("Poller");
 			running = false;
 		}
 
+		/**
+		 * Check if running is true and then download the spreadsheets with the
+		 * title defined by the user
+		 */
 		@Override
 		public void run() {
 			super.run();
 			running = true;
-			while (getRunning()) {
+			while (running) {
 				Log.v(TAG, "Polling...");
 				try {
-					ArrayList<SpreadSheet> spreadsheets = getSpreadsheetFactory().getSpreadSheet(spreadsheetTitle, true);
-					Log.v(TAG, (spreadsheets == null ? "no" : spreadsheets.size()) + " spreadsheets found");
+					app.parseEvents();
+					sleeptime = Integer
+							.parseInt(app
+									.getPrefs()
+									.getString(
+											(String) getText(R.string.credentialsKeyMinutesBetweenUpdates),
+											"60")) * 60000;
+					
 					sleep(sleeptime);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
@@ -90,31 +93,21 @@ public class PollerService extends Service implements OnSharedPreferenceChangeLi
 			}
 		}
 
+		/**
+		 * Set the running variable to false in order to stop the thread the
+		 * next loop iteration
+		 */
 		public synchronized void stopThread() {
 			running = false;
 		}
 
-		private synchronized boolean getRunning() {
+		/**
+		 * Get the status of the thread, running or stopped
+		 * 
+		 * @return thread status
+		 */
+		public synchronized boolean getRunning() {
 			return running;
-		}
-
-		private SpreadSheetFactory getSpreadsheetFactory() {
-			if (spreadsheetFactory == null) {
-
-				if (preferences.getBoolean("useDefaultAccount", true)) {
-					Log.v(TAG, "Logging in with default account.");
-					spreadsheetFactory = SpreadSheetFactory.getInstance(new AndroidAuthenticator(getApplicationContext()));
-				} else {
-					Log.v(TAG, "Logging in with custom account.");
-					String email = preferences.getString("customAccountEmail", "");
-					String password = preferences.getString("customAccountPassword", "");
-					spreadsheetFactory = SpreadSheetFactory.getInstance(email, password);
-				}
-
-				sleeptime = Integer.parseInt(preferences.getString("minutesBetweenUpdates", "60")) * 60000;
-				spreadsheetTitle = preferences.getString("spreadsheetTitle", "");
-			}
-			return spreadsheetFactory;
 		}
 	}
 }

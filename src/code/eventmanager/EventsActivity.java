@@ -13,26 +13,27 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 
-public class EventsActivity extends Activity implements OnClickListener, OnSharedPreferenceChangeListener {
-	
-	private static final String TAG = "EventsActivity";
-	
+public class EventsActivity extends Activity implements OnClickListener,
+		OnSharedPreferenceChangeListener {
+
+	private static final String TAG = EventsActivity.class.getSimpleName();
+
 	Button buttonNewEvent;
 	Intent pollerServiceIntent;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+
 		setContentView(R.layout.events_layout);
-		
+
 		pollerServiceIntent = null;
 		startPoller();
-		
+
 		buttonNewEvent = (Button) findViewById(R.id.eventsButtonNewEvent);
 		buttonNewEvent.setOnClickListener(this);
 	}
-	
+
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
@@ -41,7 +42,8 @@ public class EventsActivity extends Activity implements OnClickListener, OnShare
 	}
 
 	@Override
-	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
+			String key) {
 		// TODO Auto-generated method stub
 	}
 
@@ -67,10 +69,13 @@ public class EventsActivity extends Activity implements OnClickListener, OnShare
 		case R.id.menuItemPreferences:
 			startActivity(new Intent(this, PreferencesActivity.class));
 			break;
+		case R.id.menuItemSyncNow:
+			
+			break;
 		}
 		return true;
 	}
-	
+
 	private void startPoller() {
 		if (pollerServiceIntent == null) {
 			pollerServiceIntent = new Intent(this, PollerService.class);
@@ -79,7 +84,7 @@ public class EventsActivity extends Activity implements OnClickListener, OnShare
 			Log.d(TAG, "startPoller(): PollerService is already running.");
 		}
 	}
-	
+
 	private void stopPoller() {
 		if (pollerServiceIntent != null) {
 			stopService(pollerServiceIntent);

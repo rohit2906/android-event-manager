@@ -1,11 +1,8 @@
 package code.eventmanager;
 
 import android.app.Activity;
-import android.app.Application;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -19,12 +16,15 @@ public class LoginActivity extends Activity implements OnClickListener {
 	Button btnOtherAccount;
 	EventManagerApp app;
 
+	/**
+	 * Reference to the widgets in the UI and set the listeners
+	 */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.login_layout);
 
-		app=(EventManagerApp)getApplication();
+		app = (EventManagerApp) getApplication();
 
 		btnLogin = (Button) findViewById(R.id.loginBtnLogin);
 		btnOtherAccount = (Button) findViewById(R.id.loginBtnOtherAccount);
@@ -33,18 +33,22 @@ public class LoginActivity extends Activity implements OnClickListener {
 		Log.d(TAG, "onCreate()");
 	}
 
+	/**
+	 * Handle the onClick events. <code>loginBtnLogin</code> simply start the
+	 * EventsActivity because the default account is set when the app start
+	 * <code>loginBtnOtherAccount</code> start the CredentialsActivity
+	 */
 	@Override
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.loginBtnLogin:
-			app.getPrefs().edit().putBoolean("useDefaultAccount", true);
-			app.getPrefs().edit().apply();
 			startActivity(new Intent(this, EventsActivity.class));
 			Log.d(TAG, "loginBtnLogin onClick()");
 			break;
 
 		case R.id.loginBtnOtherAccount:
-			startActivityIfNeeded(new Intent(this, CredentialsActivity.class), -1);
+			startActivityIfNeeded(new Intent(this, CredentialsActivity.class),
+					-1);
 			Log.d(TAG, "loginBtnOtherAccount onClick()");
 			break;
 		}
