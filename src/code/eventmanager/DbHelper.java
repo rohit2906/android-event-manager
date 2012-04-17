@@ -34,22 +34,23 @@ public class DbHelper extends SQLiteOpenHelper {
 	 */
 	@Override
 	public void onCreate(SQLiteDatabase db) {
+		Log.i(TAG, "onCreated");
 		String sql;
 		sql = "CREATE TABLE " + TABLE_EVENTS + " (" + EVENTS_ID
 				+ " integer NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, "
 				+ EVENTS_NAME + " text NOT NULL, " + EVENTS_DESCRIPTION
-				+ " text, " + EVENTS_CREATOR + " text NOT NULL"
+				+ " text, " + EVENTS_CREATOR + " text NOT NULL, "
 				+ EVENTS_STARTING_TS + " integer NOT NULL, " + EVENTS_ENDING_TS
 				+ " integer NOT NULL)";
 		db.execSQL(sql);
-		Log.d(TAG, "onCreated sql: " + sql);
+		Log.v(TAG, "SQL executed: " + sql);
 		sql = "CREATE TABLE " + TABLE_ATTENDINGS + " (" + ATTENDINGS_EVENT_ID
 				+ " integer NOT NULL REFERENCES " + TABLE_EVENTS + "("
 				+ EVENTS_ID + ") ON DELETE CASCADE ON UPDATE CASCADE, "
 				+ ATTENDINGS_EMAILS
-				+ " text NOT NULL,PRIMARY KEY (ID_events,Mails))";
+				+ " text NOT NULL, PRIMARY KEY (" + ATTENDINGS_EVENT_ID + "," + ATTENDINGS_EMAILS + "))";
 		db.execSQL(sql);
-		Log.d(TAG, "onCreated sql: " + sql);
+		Log.v(TAG, "SQL executed: " + sql);
 	}
 
 	/**
@@ -57,6 +58,7 @@ public class DbHelper extends SQLiteOpenHelper {
 	 */
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+		Log.i(TAG, "onUpgrade");
 		db.execSQL("drop table if exists " + TABLE_ATTENDINGS);
 		db.execSQL("drop table if exists " + TABLE_EVENTS);
 		Log.d(TAG, "onUpdated");

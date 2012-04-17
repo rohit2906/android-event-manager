@@ -1,113 +1,33 @@
 package code.eventmanager;
 
-import java.util.ArrayList;
-import android.app.Service;
+import android.app.IntentService;
 import android.content.Intent;
-import android.os.IBinder;
 import android.util.Log;
-import com.pras.SpreadSheet;
 
-public class PollerService extends Service {
+public class PollerService extends IntentService {
 
 	private static final String TAG = PollerService.class.getSimpleName();
 
-	private Poller thread;
-	private EventManagerApp app;
-	private String spreadsheetTitle;
-	private int sleeptime;
+	public static final String NEW_EVENTS_INTENT = "code.eventmanager.NEW_STATUS";
+	public static final String NEW_EVENTS_EXTRA_COUNT = "NEW_STATUS_EXTRA_COUNT";
+	public static final String RECEIVE_EVENTS_NOTIFICATIONS = "code.eventmanager.RECEIVE_EVENTS_NOTIFICATIONS";
 
-	/**
-	 * Instance the thread
-	 */
-	@Override
-	public void onCreate() {
-		app = (EventManagerApp) getApplication();
-		Log.v(TAG, "onCreate");
-		thread = new Poller();
-	}
-
-	/**
-	 * Stop the thread and destroy the service
-	 */
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
-		Log.v(TAG, "onDestroy");
-		thread.stopThread();
-		thread.interrupt(); // With only interrupt the thread could continue to
-							// run
-		thread = null;
-	}
-
-	/**
-	 * Start the thread
-	 */
-	@Override
-	public int onStartCommand(Intent intent, int flags, int startId) {
-		Log.v(TAG, "onStartCommand");
-		thread.start();
-		return super.onStartCommand(intent, flags, startId);
+	public PollerService() {
+		super(TAG);
+		Log.d(TAG, TAG + " constructed");
 	}
 
 	@Override
-	public IBinder onBind(Intent intent) {
-		return null;
-	}
-
-	private class Poller extends Thread {
-
-		final String TAG = Poller.class.getSimpleName();
-		private volatile boolean running;
-
-		/**
-		 * Instance the thread without start it
-		 */
-		public Poller() {
-			super("Poller");
-			running = false;
-		}
-
-		/**
-		 * Check if running is true and then download the spreadsheets with the
-		 * title defined by the user
-		 */
-		@Override
-		public void run() {
-			super.run();
-			running = true;
-			while (running) {
-				Log.v(TAG, "Polling...");
-				try {
-					app.parseEvents();
-					sleeptime = Integer
-							.parseInt(app
-									.getPrefs()
-									.getString(
-											(String) getText(R.string.credentialsKeyMinutesBetweenUpdates),
-											"60")) * 60000;
-					
-					sleep(sleeptime);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-
-		/**
-		 * Set the running variable to false in order to stop the thread the
-		 * next loop iteration
-		 */
-		public synchronized void stopThread() {
-			running = false;
-		}
-
-		/**
-		 * Get the status of the thread, running or stopped
-		 * 
-		 * @return thread status
-		 */
-		public synchronized boolean getRunning() {
-			return running;
-		}
+	protected void onHandleIntent(Intent intent) {
+		Log.d(TAG, "onHandleIntent");
+		EventManagerApp app = (EventManagerApp) getApplication();
+		int news=app.parseEvents();
+		if (news > 0) {
+			Log.d(TAG, "New events found");
+			Log.v(TAG, news + " new events");
+			Intent newEventIntent = new Intent(NEW_EVENTS_INTENT);
+			sendBroadcast(newEventIntent, RECEIVE_EVENTS_NOTIFICATIONS);
+		}else
+			Log.d(TAG, "No new events");
 	}
 }

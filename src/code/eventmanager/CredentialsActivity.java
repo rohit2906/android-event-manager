@@ -25,6 +25,7 @@ public class CredentialsActivity extends Activity implements OnClickListener {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		Log.i(TAG, "onCreate");
 		setContentView(R.layout.credentials_layout);
 
 		app = (EventManagerApp) getApplication();
@@ -33,7 +34,6 @@ public class CredentialsActivity extends Activity implements OnClickListener {
 		etUsername = (EditText) findViewById(R.id.credentialsEtUsername);
 		etPassword = (EditText) findViewById(R.id.credentialsEtPassword);
 		btnLogin.setOnClickListener(this);
-		Log.d(TAG, "onCreate");
 	}
 
 	/**
@@ -41,6 +41,7 @@ public class CredentialsActivity extends Activity implements OnClickListener {
 	 */
 	@Override
 	public void onClick(View v) {
+		Log.i(TAG, "onClick");
 		String username = etUsername.getText().toString();
 		String password = etPassword.getText().toString();
 		if (username.isEmpty()) {
@@ -69,7 +70,6 @@ public class CredentialsActivity extends Activity implements OnClickListener {
 
 			startActivity(new Intent(this, EventsActivity.class));
 		}
-		Log.d(TAG, "onClick");
 	}
 
 	/**
@@ -78,7 +78,7 @@ public class CredentialsActivity extends Activity implements OnClickListener {
 	 */
 	@Override
 	public void onBackPressed() {
+		Log.i(TAG, "onBackPressed");
 		startActivityIfNeeded(new Intent(this, LoginActivity.class), -1);
-		Log.d(TAG, "onBackPressed");
 	}
 }
