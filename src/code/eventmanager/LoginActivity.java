@@ -2,6 +2,7 @@ package code.eventmanager;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -22,6 +23,7 @@ public class LoginActivity extends Activity implements OnClickListener {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		Log.i(TAG, "onCreate");
 		setContentView(R.layout.login_layout);
 
 		app = (EventManagerApp) getApplication();
@@ -30,7 +32,7 @@ public class LoginActivity extends Activity implements OnClickListener {
 		btnOtherAccount = (Button) findViewById(R.id.loginBtnOtherAccount);
 		btnLogin.setOnClickListener(this);
 		btnOtherAccount.setOnClickListener(this);
-		Log.d(TAG, "onCreate()");
+
 	}
 
 	/**
@@ -40,16 +42,21 @@ public class LoginActivity extends Activity implements OnClickListener {
 	 */
 	@Override
 	public void onClick(View v) {
+		Log.i(TAG, "onClick");
 		switch (v.getId()) {
 		case R.id.loginBtnLogin:
-			startActivity(new Intent(this, EventsActivity.class));
 			Log.d(TAG, "loginBtnLogin onClick()");
+			SharedPreferences.Editor editor = app.getPrefs().edit();
+			editor.putBoolean(
+					(String) getText(R.string.credentialsKeyDefaultAccount),
+					true);
+			editor.apply();
+			startActivity(new Intent(this, EventsActivity.class));
 			break;
 
 		case R.id.loginBtnOtherAccount:
-			startActivityIfNeeded(new Intent(this, CredentialsActivity.class),
-					-1);
 			Log.d(TAG, "loginBtnOtherAccount onClick()");
+			startActivity(new Intent(this, CredentialsActivity.class));
 			break;
 		}
 	}

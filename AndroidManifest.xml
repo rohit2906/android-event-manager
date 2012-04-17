@@ -5,32 +5,24 @@
     android:versionName="1.0" >
 
     <uses-sdk android:minSdkVersion="10" />
-    
-    <uses-permission android:name="android.permission.INTERNET"/>
-	<uses-permission android:name="android.permission.USE_CREDENTIALS"/>
-	<uses-permission android:name="android.permission.GET_ACCOUNTS"/>
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
 
     <application
+        android:name=".EventManagerApp"
         android:icon="@drawable/ic_launcher"
         android:label="@string/eventManagerTitle" >
-         <activity
-             android:noHistory="true"
-            android:name=".EventManagerActivity"
-            android:label="@string/eventManagerTitle" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
         <activity
-            android:noHistory="true"
             android:name=".LoginActivity"
-            android:label="@string/loginTitle" >
+            android:label="@string/loginTitle"
+            android:noHistory="true" >
         </activity>
         <activity
-            android:noHistory="true"
             android:name=".CredentialsActivity"
-            android:label="@string/credentialsTitle" >
+            android:label="@string/credentialsTitle"
+            android:noHistory="true" >
         </activity>
         <activity
             android:name=".PreferencesActivity"
@@ -44,7 +36,21 @@
             android:name=".NewEventActivity"
             android:label="@string/neweventTitle" >
         </activity>
-        <service android:name=".PollerService" android:label="@string/pollerTitle"></service>
+
+        <service
+            android:name=".PollerService"
+            android:label="@string/pollerTitle" >
+        </service>
+
+        <activity
+            android:name=".FirstActivity"
+            android:theme="@android:style/Theme.NoDisplay" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>
