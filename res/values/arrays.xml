@@ -2,6 +2,9 @@
 <resources>
 
     <string-array name="minutesBetweenUpdatesString">
+        <item>No auto-updates</item>
+        <item>10 seconds</item>
+        <item>30 seconds</item>
         <item>1  minute</item>
         <item>15 minutes</item>
         <item>30 minutes</item>
@@ -15,20 +18,23 @@
         <item>1  month</item>
         <item>1  year</item>
     </string-array>
-    
+
     <string-array name="minutesBetweenUpdatesValues">
-        <item>1</item>
-        <item>15</item>
-        <item>30</item>
-        <item>60</item>
-        <item>120</item>
-        <item>360</item>
-        <item>720</item>
-        <item>1440</item>
-        <item>2880</item>
-        <item>10080</item>
-        <item>43200</item>
-        <item>525600</item>
+        <item>0</item>
+        <item>10000</item>
+        <item>30000</item>
+        <item>60000</item>
+        <item>900000</item>
+        <item>1800000</item>
+        <item>3600000</item>
+        <item>7200000</item>
+        <item>21600000</item>
+        <item>43200000</item>
+        <item>86400000</item>
+        <item>172800000</item>
+        <item>604800000</item>
+        <item>2592000000</item>
+        <item>31104000000</item>
     </string-array>
 
 </resources>

@@ -50,7 +50,7 @@ public class LoginActivity extends Activity implements OnClickListener {
 			editor.putBoolean(
 					(String) getText(R.string.credentialsKeyDefaultAccount),
 					true);
-			editor.apply();
+			editor.commit();
 			startActivity(new Intent(this, EventsActivity.class));
 			break;
 

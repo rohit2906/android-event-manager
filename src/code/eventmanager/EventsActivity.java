@@ -63,13 +63,7 @@ public class EventsActivity extends Activity implements OnClickListener {
 		buttonNewEvent.setOnClickListener(this);
 
 		// set the alarm for the PollerService
-		Log.d(TAG, "Set the alarm");
-		int interval = app
-				.getPrefs()
-				.getInt((String) getText(R.string.preferencesMinutesBetweenUpdatesText),
-						60)*1000;
-		app.setAlarm4Poller(interval);
-		startService(new Intent(this, PollerService.class));
+		app.setAlarm4Poller();
 
 		Log.d(TAG, "Set the receiver and the filter");
 		receiver = new EventsReceiver();

@@ -20,6 +20,7 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.widget.Toast;
 
 /**
  * 
@@ -80,13 +81,24 @@ public class EventManagerApp extends Application implements
 		if (key == getText(R.string.credentialsKeyDefaultAccount)) {
 			Log.d(TAG, "Change default account checkbox");
 			spreadsheetFactory = null;
-			setAccount();
+			boolean defaultAccount = prefs.getBoolean(
+					getText(R.string.credentialsKeyDefaultAccount).toString(),
+					false);
+			String username = prefs.getString(
+					getText(R.string.credentialsKeyCustomAccountMail)
+							.toString(), "");
+			String password = prefs.getString(
+					getText(R.string.credentialsKeyCustomAccountPassword)
+							.toString(), "");
+			if (defaultAccount == false && username == "" && password == "") {
+				Log.w(TAG, "No account set");
+				Toast.makeText(getApplicationContext(), "No account set",
+						Toast.LENGTH_LONG).show();
+			} else
+				setAccount();
 		} else if (key == getText(R.string.credentialsKeyMinutesBetweenUpdates)) {
 			Log.d(TAG, "Change update timer");
-			int interval = prefs
-					.getInt((String) getText(R.string.preferencesMinutesBetweenUpdatesText),
-							60)*1000;
-			setAlarm4Poller(interval);
+			setAlarm4Poller();
 		}
 	}
 
@@ -144,6 +156,10 @@ public class EventManagerApp extends Application implements
 	 *            the spreadsheet with events
 	 */
 	public int parseEvents() {
+		if (spreadsheetFactory == null) {
+			Log.w(TAG, "No account set");
+			return -1;
+		}
 		String spreadsheetTitle = prefs.getString(
 				(String) getText(R.string.credentialsKeySpreadsheetTitle), "");
 		Log.v(TAG, "Spreadsheet title: " + spreadsheetTitle);
@@ -166,7 +182,9 @@ public class EventManagerApp extends Application implements
 		int newEvents = 0;
 		Log.v(TAG, "Number of rows: " + rows.size());
 		for (int i = 0; i < rows.size(); i++) { // iterates over all rows
-			ArrayList<WorkSheetCell> wsc=rows.get(i).getCells();	// get the cells in that row
+			ArrayList<WorkSheetCell> wsc = rows.get(i).getCells(); // get the
+																	// cells in
+																	// that row
 			record.clear(); // populate the new database record
 			record.put(DbHelper.EVENTS_ID,
 					Integer.parseInt(wsc.get(0).getValue()));
@@ -197,9 +215,12 @@ public class EventManagerApp extends Application implements
 		return newEvents;
 	}
 
-	public void setAlarm4Poller(int interval) {
+	public void setAlarm4Poller() {
 		Log.d(TAG, "Updating poller alarm");
-		Log.d(TAG, "Alarm set every " + interval + " milliseconds");
+		long interval =Long.parseLong(prefs
+				.getString(getText(R.string.credentialsKeyMinutesBetweenUpdates).toString(),
+						"0"));
+		Log.v(TAG, "Alarm set every " + interval/1000 + " seconds");
 		if (interval > 0)
 			// set the alarm (it could be approximately). RTC means that the
 			// alarm'll not wake up the device if it's sleeping. The next

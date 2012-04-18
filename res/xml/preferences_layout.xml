@@ -24,7 +24,7 @@
     </EditTextPreference>
 
     <ListPreference
-        android:defaultValue="60"
+        android:defaultValue="30000"
         android:entries="@array/minutesBetweenUpdatesString"
         android:entryValues="@array/minutesBetweenUpdatesValues"
         android:key="@string/credentialsKeyMinutesBetweenUpdates"
