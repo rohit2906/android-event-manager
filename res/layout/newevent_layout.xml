@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
-        
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -18,103 +16,95 @@
             android:text="@string/neweventTextViewNewEventText"
             android:textAppearance="?android:attr/textAppearanceLarge" />
 
-        <RelativeLayout
-            android:id="@+id/relativeLayout1"
+        <TextView
+            android:id="@+id/neweventTextViewTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/neweventTextViewDimensionMarginLeft"
+            android:layout_marginTop="@dimen/neweventTextViewDimensionMarginTop"
+            android:text="@string/neweventTextViewTitleText"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+        
+        <EditText
+            android:id="@+id/neweventEditTextTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/neweventTextViewTitle"
+            android:layout_centerHorizontal="true"
+            android:width="@dimen/neweventEditTextDimensionWidth" />
+
+        <TextView
+            android:id="@+id/neweventTextViewDescription"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/neweventTextViewDimensionMarginLeft"
+            android:layout_marginTop="@dimen/neweventTextViewDimensionMarginTop"
+            android:text="@string/neweventTextViewTitleText"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <EditText
+            android:id="@+id/neweventEditTextDescription"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/neweventTextViewTitle"
+            android:layout_centerHorizontal="true"
+            android:width="@dimen/neweventEditTextDimensionWidth" />
+
+        <TextView
+            android:id="@+id/neweventTextViewStarting"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/neweventTextViewTitle"
+            android:layout_below="@+id/neweventEditTextTitle"
+            android:layout_marginTop="@dimen/neweventTextViewDimensionMarginTop"
+            android:text="@string/neweventTextViewStartingDateText"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="0.28" >
+            android:orientation="horizontal" >
 
-            <TextView
-                android:id="@+id/neweventTextViewTitle"
-                android:layout_width="wrap_content"
+            <Button
+                android:id="@+id/neweventButtonStartingDate"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/neweventTextViewDimensionMarginTop"
-                android:layout_marginLeft="@dimen/neweventTextViewDimensionMarginLeft"
-                android:text="@string/neweventTextViewTitleText"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
+                android:layout_weight="0.4"/>
 
-            <EditText
-                android:id="@+id/neweventEditTextTitle"
-                android:layout_width="wrap_content"
-                android:width = "@dimen/neweventEditTextDimensionWidth"
+            <Button
+                android:id="@+id/neweventButtonStartingTime"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/neweventTextViewTitle"
-                android:layout_centerHorizontal="true" />
+                android:layout_weight="0.6" />
+        </LinearLayout>
 
-            <TextView
-                android:id="@+id/neweventTextViewStartingDate"
-                android:layout_width="wrap_content"
+        <TextView
+            android:id="@+id/neweventTextViewEnding"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/neweventTextViewStartingHour"
+            android:layout_below="@+id/neweventEditTextStartingHour"
+            android:layout_marginTop="@dimen/neweventTextViewDimensionMarginTop"
+            android:text="@string/neweventTextViewEndingDateText"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <Button
+                android:id="@+id/neweventButtonEndingDate"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignLeft="@+id/neweventTextViewTitle"
-                android:layout_below="@+id/neweventEditTextTitle"
-                android:layout_marginTop="@dimen/neweventTextViewDimensionMarginTop"
-                android:text="@string/neweventTextViewStartingDateText"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
+                android:layout_weight="0.4"/>
 
-            <EditText
-                android:id="@+id/neweventEditTextStartingDate"
-                android:layout_width="wrap_content"
-                android:width = "@dimen/neweventEditTextDimensionWidth"
+            <Button
+                android:id="@+id/neweventButtonEndingTime"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/neweventTextViewStartingDate"
-                android:layout_centerHorizontal="true" />
-
-            <TextView
-                android:id="@+id/neweventTextViewStartingHour"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignLeft="@+id/neweventTextViewStartingDate"
-                android:layout_below="@+id/neweventEditTextStartingDate"
-                android:layout_marginTop="@dimen/neweventTextViewDimensionMarginTop"
-                android:text="@string/neweventTextViewStartingHourText"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-
-            <EditText
-                android:id="@+id/neweventEditTextStartingHour"
-                android:layout_width="wrap_content"
-                android:width = "@dimen/neweventEditTextDimensionWidth"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/neweventTextViewStartingHour"
-                android:layout_centerHorizontal="true" />
-
-
-            <TextView
-                android:id="@+id/neweventTextViewEndingDate"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignLeft="@+id/neweventTextViewStartingHour"
-                android:layout_below="@+id/neweventEditTextStartingHour"
-                android:layout_marginTop="@dimen/neweventTextViewDimensionMarginTop"
-                android:text="@string/neweventTextViewEndingDateText"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-
-            <EditText
-                android:id="@+id/neweventEditTextEndingDate"
-                android:layout_width="wrap_content"
-                android:width="@dimen/neweventEditTextDimensionWidth"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/neweventTextViewEndingDate"
-                android:layout_centerHorizontal="true"/>
-
-            <TextView
-                android:id="@+id/neweventTextViewEndingHour"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignLeft="@+id/neweventTextViewEndingDate"
-                android:layout_below="@+id/neweventEditTextEndingDate"
-                android:layout_marginTop="@dimen/neweventTextViewDimensionMarginTop"
-                android:text="@string/neweventTextViewEndingHourText"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-            
-            <EditText
-                android:id="@+id/neweventEditTextEndingHour"
-                android:layout_width="wrap_content"
-                android:width = "@dimen/neweventEditTextDimensionWidth"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/neweventTextViewEndingHour"
-                android:layout_centerHorizontal="true" />
-
-        </RelativeLayout>
+                android:layout_weight="0.6"/>
+        </LinearLayout>
 
         <Button
             android:id="@+id/neweventCreateButton"
@@ -122,7 +112,6 @@
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:text="@string/neweventTextViewCreateButtonText" />
-        
-</LinearLayout>
+    </LinearLayout>
 
 </ScrollView>
