@@ -100,6 +100,9 @@ public class EventsActivity extends Activity implements OnClickListener {
 		case R.id.menuItemSyncNow:
 			startService(new Intent(this, PollerService.class));
 			break;
+		case R.id.menuItemNewEvent:
+			startActivity(new Intent(this, NewEventActivity.class));
+			break;
 		}
 		return true;
 	}

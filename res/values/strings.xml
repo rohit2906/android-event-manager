@@ -48,5 +48,7 @@
     <string name="preferencesSpreadsheetTitleSummary">Name of the spreadsheet to check</string>
     
     <string name="pollerTitle">PollerService</string>
+    
+    <string name="menuItemNewEventText">New Event</string>
 
 </resources>
