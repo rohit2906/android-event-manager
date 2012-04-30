@@ -20,7 +20,6 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.widget.Toast;
 
 /**
  * 
@@ -77,7 +76,6 @@ public class EventManagerApp extends Application implements
 			SharedPreferences sharedPreferences, String key) {
 		Log.i(TAG, "onSharedPreferenceChanged");
 
-		// Check if is change the default account checkbox
 		if (key == getText(R.string.credentialsKeyDefaultAccount)) {
 			Log.d(TAG, "Change default account checkbox");
 			spreadsheetFactory = null;
@@ -142,10 +140,8 @@ public class EventManagerApp extends Application implements
 	/**
 	 * Allocate a new spreadsheetfactory for the new custom account
 	 * 
-	 * @param email
-	 *            username
-	 * @param password
-	 *            password
+	 * @param email username
+	 * @param password password
 	 */
 	public void setAnotherAccount(String email, String password) {
 		Log.d(TAG, "Setting up custom account");
@@ -156,35 +152,29 @@ public class EventManagerApp extends Application implements
 	/**
 	 * Parse the events in the spreadsheet
 	 * 
-	 * @param spreadsheet
-	 *            the spreadsheet with events
-	 * @param worksheet
-	 *            the spreadsheet with events
+	 * @param spreadsheet the spreadsheet with events
+	 * @param worksheet the spreadsheet with events
 	 */
 	public int parseEvents() {
-		if (spreadsheetFactory == null) {
+		if (getSpreadsheetFactory() == null) {
 			Log.w(TAG, "No account set");
 			return -1;
 		}
-		String spreadsheetTitle = prefs.getString(
-				(String) getText(R.string.credentialsKeySpreadsheetTitle), "");
+		
+		String spreadsheetTitle = prefs.getString((String) getText(R.string.credentialsKeySpreadsheetTitle), "event_manager");
 		Log.v(TAG, "Spreadsheet title: " + spreadsheetTitle);
-		ArrayList<SpreadSheet> spreadsheets = spreadsheetFactory
-				.getAllSpreadSheets(true, spreadsheetTitle, true);
-		// ArrayList<SpreadSheet> spreadsheets = getSpreadsheetFactory()
-		// .getSpreadSheet(spreadsheetTitle, true);
+		ArrayList<SpreadSheet> spreadsheets = getSpreadsheetFactory().getAllSpreadSheets(true, spreadsheetTitle, true);
 		if (spreadsheets == null) {
 			Log.d(TAG, "No spreadsheet found. Creating new one.");
 			getSpreadsheetFactory().createSpreadSheet(spreadsheetTitle);
 			return 0;
 		}
-		Log.d(TAG, "Spreadsheets found");
-		Log.d(TAG, "Parsing events...");
+		
+		Log.d(TAG, "Spreadsheets found. Parsing events...");
 		WorkSheet ws = spreadsheets.get(0).getAllWorkSheets().get(0);
 		ArrayList<WorkSheetRow> rows = ws.getData(false);
 
-		SQLiteDatabase db = dbHelper.getWritableDatabase(); // open the
-															// database
+		SQLiteDatabase db = dbHelper.getWritableDatabase(); // open the database
 		ContentValues record = new ContentValues();
 
 		int newEvents = 0;
@@ -225,19 +215,16 @@ public class EventManagerApp extends Application implements
 
 	public void setAlarm4Poller() {
 		Log.d(TAG, "Updating poller alarm");
-		long interval = Long.parseLong(prefs.getString(
-				getText(R.string.credentialsKeyMinutesBetweenUpdates)
-						.toString(), "30000"));
-		Log.v(TAG, "Alarm set every " + interval / 1000 + " seconds");
-		if (interval > 0)
-			// set the alarm (it could be approximately). RTC means that the
-			// alarm'll not wake up the device if it's sleeping. The next
+		alarmManager.cancel(pollerTriggerPendingIntent);
+		int minutes = Integer.parseInt(prefs.getString(getText(R.string.credentialsKeyMinutesBetweenUpdates).toString().trim(), "1"));
+		if (minutes > 0) {
+			// set the alarm (it could be approximately). RTC means that the alarm'll not wake up the device if it's sleeping. The next
 			// parameter specifies the time is in milliseconds.
-			alarmManager.setInexactRepeating(AlarmManager.RTC,
-					System.currentTimeMillis(), interval,
-					pollerTriggerPendingIntent);
-		else
-			alarmManager.cancel(pollerTriggerPendingIntent);
+			alarmManager.setInexactRepeating(AlarmManager.RTC, System.currentTimeMillis(), minutes * 60000, pollerTriggerPendingIntent);
+			Log.v(TAG, "Alarm set every " + minutes + " minutes");
+		} else {
+			Log.v(TAG, "Automatic updates disabled");
+		}
 	}
 
 	/**

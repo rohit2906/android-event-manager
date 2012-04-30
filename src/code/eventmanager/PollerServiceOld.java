@@ -77,11 +77,7 @@ public class PollerServiceOld extends Service {
 				try {
 					app.parseEvents();
 					sleeptime = Integer
-							.parseInt(app
-									.getPrefs()
-									.getString(
-											(String) getText(R.string.credentialsKeyMinutesBetweenUpdates),
-											"60")) * 60000;
+							.parseInt(app.getPrefs().getString((String) getText(R.string.credentialsKeyMinutesBetweenUpdates), "60")) * 60000;
 					
 					sleep(sleeptime);
 				} catch (InterruptedException e) {
