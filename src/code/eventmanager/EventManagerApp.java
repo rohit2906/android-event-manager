@@ -77,7 +77,7 @@ public class EventManagerApp extends Application implements
 			SharedPreferences sharedPreferences, String key) {
 		Log.i(TAG, "onSharedPreferenceChanged");
 
-		//Check if is change the defaul account checkbox
+		// Check if is change the default account checkbox
 		if (key == getText(R.string.credentialsKeyDefaultAccount)) {
 			Log.d(TAG, "Change default account checkbox");
 			spreadsheetFactory = null;
@@ -90,7 +90,8 @@ public class EventManagerApp extends Application implements
 				Log.w(TAG, "No account set");
 		}
 
-		//check if the user type a new username or password for the custom account
+		// check if the user type a new username or password for the custom
+		// account
 		else if (key == getText(R.string.credentialsKeyCustomAccountMail)
 				|| key == getText(R.string.credentialsKeyCustomAccountPassword)) {
 			String email = prefs.getString(
@@ -102,8 +103,8 @@ public class EventManagerApp extends Application implements
 							"");
 			if (email != "" && password != "")
 				setAnotherAccount(email, password);
-		} 
-		
+		}
+
 		//
 		else if (key == getText(R.string.credentialsKeyMinutesBetweenUpdates)) {
 			Log.d(TAG, "Change update timer");
@@ -168,12 +169,14 @@ public class EventManagerApp extends Application implements
 		String spreadsheetTitle = prefs.getString(
 				(String) getText(R.string.credentialsKeySpreadsheetTitle), "");
 		Log.v(TAG, "Spreadsheet title: " + spreadsheetTitle);
-		ArrayList<SpreadSheet> spreadsheets = getSpreadsheetFactory()
-				.getSpreadSheet(spreadsheetTitle, true);
+		ArrayList<SpreadSheet> spreadsheets = spreadsheetFactory
+				.getAllSpreadSheets(true, spreadsheetTitle, true);
+		// ArrayList<SpreadSheet> spreadsheets = getSpreadsheetFactory()
+		// .getSpreadSheet(spreadsheetTitle, true);
 		if (spreadsheets == null) {
 			Log.d(TAG, "No spreadsheet found. Creating new one.");
 			getSpreadsheetFactory().createSpreadSheet(spreadsheetTitle);
-			return -1;
+			return 0;
 		}
 		Log.d(TAG, "Spreadsheets found");
 		Log.d(TAG, "Parsing events...");
