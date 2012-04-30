@@ -24,10 +24,8 @@ import android.widget.Toast;
 
 /**
  * 
- * @author Daniele Vitali
- * 
- *         Application class in order to share all information that are needed
- *         to the other activities
+ * Application class in order to share all information that are needed to the
+ * other activities
  */
 public class EventManagerApp extends Application implements
 		OnSharedPreferenceChangeListener {
@@ -78,25 +76,36 @@ public class EventManagerApp extends Application implements
 	public synchronized void onSharedPreferenceChanged(
 			SharedPreferences sharedPreferences, String key) {
 		Log.i(TAG, "onSharedPreferenceChanged");
+
+		//Check if is change the defaul account checkbox
 		if (key == getText(R.string.credentialsKeyDefaultAccount)) {
 			Log.d(TAG, "Change default account checkbox");
 			spreadsheetFactory = null;
 			boolean defaultAccount = prefs.getBoolean(
 					getText(R.string.credentialsKeyDefaultAccount).toString(),
 					false);
-			String username = prefs.getString(
-					getText(R.string.credentialsKeyCustomAccountMail)
-							.toString(), "");
-			String password = prefs.getString(
-					getText(R.string.credentialsKeyCustomAccountPassword)
-							.toString(), "");
-			if (defaultAccount == false && username == "" && password == "") {
-				Log.w(TAG, "No account set");
-				Toast.makeText(getApplicationContext(), "No account set",
-						Toast.LENGTH_LONG).show();
+			if (defaultAccount == true) {
+				setDefaultAccount();
 			} else
-				setAccount();
-		} else if (key == getText(R.string.credentialsKeyMinutesBetweenUpdates)) {
+				Log.w(TAG, "No account set");
+		}
+
+		//check if the user type a new username or password for the custom account
+		else if (key == getText(R.string.credentialsKeyCustomAccountMail)
+				|| key == getText(R.string.credentialsKeyCustomAccountPassword)) {
+			String email = prefs.getString(
+					(String) getText(R.string.credentialsKeyCustomAccountMail),
+					"");
+			String password = prefs
+					.getString(
+							(String) getText(R.string.credentialsKeyCustomAccountPassword),
+							"");
+			if (email != "" && password != "")
+				setAnotherAccount(email, password);
+		} 
+		
+		//
+		else if (key == getText(R.string.credentialsKeyMinutesBetweenUpdates)) {
 			Log.d(TAG, "Change update timer");
 			setAlarm4Poller();
 		}
@@ -121,30 +130,26 @@ public class EventManagerApp extends Application implements
 	}
 
 	/**
-	 * Check whether to use the default account or a custom account to connect
-	 * to the spreadsheet
+	 * Allocate a new spreadsheetfactory for default account on the smartphone
 	 */
-	public void setAccount() {
-		Log.d(TAG, "Setting up account");
-		if (prefs.getBoolean(
-				(String) getText(R.string.credentialsKeyDefaultAccount), true)) {
-			Log.d(TAG, "Logging in with default account.");
-			spreadsheetFactory = SpreadSheetFactory
-					.getInstance(new AndroidAuthenticator(
-							getApplicationContext()));
-		} else {
-			Log.d(TAG, "Logging in with custom account.");
-			String email = prefs.getString(
-					(String) getText(R.string.credentialsKeyCustomAccountMail),
-					"");
-			String password = prefs
-					.getString(
-							(String) getText(R.string.credentialsKeyCustomAccountPassword),
-							"");
-			Log.v(TAG, "Email: " + email + " - Password: " + password);
-			spreadsheetFactory = SpreadSheetFactory
-					.getInstance(email, password);
-		}
+	public void setDefaultAccount() {
+		Log.d(TAG, "Logging in with default account.");
+		spreadsheetFactory = SpreadSheetFactory
+				.getInstance(new AndroidAuthenticator(getApplicationContext()));
+	}
+
+	/**
+	 * Allocate a new spreadsheetfactory for the new custom account
+	 * 
+	 * @param email
+	 *            username
+	 * @param password
+	 *            password
+	 */
+	public void setAnotherAccount(String email, String password) {
+		Log.d(TAG, "Setting up custom account");
+		Log.v(TAG, "Email: " + email + " - Password: " + password);
+		spreadsheetFactory = SpreadSheetFactory.getInstance(email, password);
 	}
 
 	/**
@@ -170,7 +175,7 @@ public class EventManagerApp extends Application implements
 			getSpreadsheetFactory().createSpreadSheet(spreadsheetTitle);
 			return -1;
 		}
-		Log.d(TAG, spreadsheets.size() + " spreadsheets found");
+		Log.d(TAG, "Spreadsheets found");
 		Log.d(TAG, "Parsing events...");
 		WorkSheet ws = spreadsheets.get(0).getAllWorkSheets().get(0);
 		ArrayList<WorkSheetRow> rows = ws.getData(false);
@@ -217,10 +222,10 @@ public class EventManagerApp extends Application implements
 
 	public void setAlarm4Poller() {
 		Log.d(TAG, "Updating poller alarm");
-		long interval =Long.parseLong(prefs
-				.getString(getText(R.string.credentialsKeyMinutesBetweenUpdates).toString(),
-						"0"));
-		Log.v(TAG, "Alarm set every " + interval/1000 + " seconds");
+		long interval = Long.parseLong(prefs.getString(
+				getText(R.string.credentialsKeyMinutesBetweenUpdates)
+						.toString(), "30000"));
+		Log.v(TAG, "Alarm set every " + interval / 1000 + " seconds");
 		if (interval > 0)
 			// set the alarm (it could be approximately). RTC means that the
 			// alarm'll not wake up the device if it's sleeping. The next
