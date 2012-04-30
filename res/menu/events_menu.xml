@@ -3,12 +3,13 @@
 
     <item
         android:id="@+id/menuItemSyncNow"
-        android:icon="@drawable/ic_menu_refresh"
+        android:icon="@drawable/ic_menu_add"
         android:title="@string/menuItemSyncNowText" />
     
     <item
         android:id="@+id/menuItemPreferences"
         android:icon="@drawable/ic_menu_preferences"
         android:title="@string/menuItemPreferencesText" />
+    <item android:id="@+id/menuItemNewEvent" android:title="@string/menuItemNewEventText" android:icon="@drawable/ic_menu_add"></item>
     
 </menu>
