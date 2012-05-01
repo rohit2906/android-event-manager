@@ -17,16 +17,11 @@
     <string name="credentialsKeyMinutesBetweenUpdates">minutesBetweenUpdates</string>
     <string name="credentialsKeyCustomAccountPassword">customAccountPassword</string>
     <string name="credentialsKeyCustomAccountMail">customAccountEmail</string>
-    
-    
-    <string name="neweventTitle">New Event</string>
     <string name="neweventTextViewNewEventText">New Event</string>
     <string name="neweventTextViewTitleText">Title</string>
-    <string name="neweventTextViewStartingDateText">Starting Date</string>
-    <string name="neweventTextViewStartingHourText">Starting Hour</string>
-    <string name="neweventTextViewEndingDateText">Ending Date</string>
-    <string name="neweventTextViewEndingHourText">Ending Hour</string>
-    <string name="neweventTextViewCreateButtonText">Create</string>
+    <string name="neweventTextViewStartingText">Starting</string>
+    <string name="neweventTextViewEndingText">Ending</string>
+    <string name="neweventButtonCreateText">Create</string>
     
     <string name="eventsTitle">Upcoming Events</string>
     <string name="eventsTitleText">Upcoming Events</string>
@@ -50,5 +45,9 @@
     <string name="pollerTitle">PollerService</string>
     
     <string name="menuItemNewEventText">New Event</string>
+    <string name="neweventButtonCancelText">Cancel</string>
+    <string name="neweventTextViewDescriptionText">Description</string>
+    <string name="neweventTextViewAddressText">Address</string>
+    <string name="neweventTitle">New Event</string>
 
 </resources>
