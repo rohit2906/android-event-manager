@@ -62,7 +62,8 @@
                     android:id="@+id/neweventEditTextTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="text" />
+                    android:inputType="text" 
+                    android:text="Event title 1"/>
             </LinearLayout>
 
             <LinearLayout
@@ -143,7 +144,8 @@
                     android:id="@+id/neweventEditTextAddress"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="textPostalAddress" />
+                    android:inputType="textPostalAddress"
+                    android:text="Event address 1" />
             </LinearLayout>
 
             <LinearLayout
@@ -163,7 +165,8 @@
                     android:id="@+id/neweventEditTextDescription"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="textMultiLine" />
+                    android:inputType="textMultiLine"
+                    android:text="Event description 1" />
             </LinearLayout>
         </LinearLayout>
     </ScrollView>
