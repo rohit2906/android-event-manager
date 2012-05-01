@@ -11,10 +11,10 @@ public class DbHelper extends SQLiteOpenHelper {
 	private static final String TAG = DbHelper.class.getSimpleName();
 
 	public static final String DB_NAME = "EventManager.db";
-	public static int DB_VERSION = 1;
+	public static int DB_VERSION = 2;
 	public static final String TABLE_EVENTS = "events";
 	public static final String TABLE_ATTENDINGS = "attendings";
-	public static final String EVENTS_ID = BaseColumns._ID; // why???
+	public static final String EVENTS_ID = BaseColumns._ID;
 	public static final String EVENTS_NAME = "name";
 	public static final String EVENTS_ADDRESS = "address";
 	public static final String EVENTS_DESCRIPTION = "description";
@@ -42,8 +42,8 @@ public class DbHelper extends SQLiteOpenHelper {
 				+ EVENTS_NAME + " text NOT NULL, " + EVENTS_ADDRESS + " text, "
 				+ EVENTS_DESCRIPTION + " text, " + EVENTS_CREATOR
 				+ " text NOT NULL, " + EVENTS_STARTING_TS
-				+ " integer NOT NULL, " + EVENTS_ENDING_TS
-				+ " integer NOT NULL)";
+				+ " text NOT NULL, " + EVENTS_ENDING_TS
+				+ " text NOT NULL)";
 		db.execSQL(sql);
 		Log.v(TAG, "SQL executed: " + sql);
 		sql = "CREATE TABLE " + TABLE_ATTENDINGS + " (" + ATTENDINGS_EVENT_ID

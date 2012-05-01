@@ -177,7 +177,7 @@ public class EventManagerApp extends Application implements
 		
 		if ((spreadsheets == null) || (spreadsheets.size() == 0)) {
 			Log.d(TAG, "No spreadsheet found. Creating new one.");
-			getSpreadsheetFactory().createSpreadSheet(spreadsheetTitle);
+			createWebSpreadSheet(spreadsheetTitle);
 			return 0;
 		}
 		
@@ -248,5 +248,20 @@ public class EventManagerApp extends Application implements
 	 */
 	public DbHelper getDbHelper() {
 		return dbHelper;
+	}
+	
+	private void createWebSpreadSheet(String spreadsheetTitle) {
+		getSpreadsheetFactory().createSpreadSheet(spreadsheetTitle);
+		ArrayList<SpreadSheet> spreadsheets = getSpreadsheetFactory().getSpreadSheet(spreadsheetTitle, false);
+		String[] columns=new String[7];
+		columns[0]=DbHelper.EVENTS_ID;
+		columns[1]=DbHelper.EVENTS_NAME;
+		columns[2]=DbHelper.EVENTS_ADDRESS;
+		columns[3]=DbHelper.EVENTS_DESCRIPTION;
+		columns[4]=DbHelper.EVENTS_CREATOR;
+		columns[5]=DbHelper.EVENTS_STARTING_TS;
+		columns[6]=DbHelper.EVENTS_ENDING_TS;
+		spreadsheets.get(0).addWorkSheet(spreadsheetTitle, columns);
+		spreadsheets.get(0).deleteWorkSheet(spreadsheets.get(0).getAllWorkSheets().get(0));
 	}
 }
