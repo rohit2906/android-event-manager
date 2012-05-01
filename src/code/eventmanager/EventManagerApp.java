@@ -65,6 +65,8 @@ public class EventManagerApp extends Application implements
 	@Override
 	public void onTerminate() {
 		super.onTerminate();
+		// TODO remove later or put a preference like "run in background"
+		alarmManager.cancel(pollerTriggerPendingIntent);
 		Log.i(TAG, "onTerminated");
 	}
 
@@ -84,26 +86,34 @@ public class EventManagerApp extends Application implements
 					false);
 			if (defaultAccount == true) {
 				setDefaultAccount();
-			} else
-				Log.w(TAG, "No account set");
+			} else {
+				// check if user e-mail and password are emptyString email = prefs.getString(
+				String email = prefs.getString(
+						(String) getText(R.string.credentialsKeyCustomAccountMail), "");
+				String password = prefs.getString(
+						(String) getText(R.string.credentialsKeyCustomAccountPassword), "");
+				
+				if (email.isEmpty() || password.isEmpty()) 
+					Log.i(TAG, "No account set");
+				else
+					setAnotherAccount(email, password);
+			}
 		}
 
 		// check if the user type a new username or password for the custom
 		// account
 		else if (key == getText(R.string.credentialsKeyCustomAccountMail)
-				|| key == getText(R.string.credentialsKeyCustomAccountPassword)) {
+				|| key == getText(R.string.credentialsKeyCustomAccountPassword))
+		{
 			String email = prefs.getString(
-					(String) getText(R.string.credentialsKeyCustomAccountMail),
-					"");
-			String password = prefs
-					.getString(
-							(String) getText(R.string.credentialsKeyCustomAccountPassword),
-							"");
+					(String) getText(R.string.credentialsKeyCustomAccountMail), "");
+			String password = prefs.getString(
+					(String) getText(R.string.credentialsKeyCustomAccountPassword), "");
+			
 			if (email != "" && password != "")
 				setAnotherAccount(email, password);
 		}
-
-		//
+		
 		else if (key == getText(R.string.credentialsKeyMinutesBetweenUpdates)) {
 			Log.d(TAG, "Change update timer");
 			setAlarm4Poller();
@@ -145,7 +155,7 @@ public class EventManagerApp extends Application implements
 	 */
 	public void setAnotherAccount(String email, String password) {
 		Log.d(TAG, "Setting up custom account");
-		Log.v(TAG, "Email: " + email + " - Password: " + password);
+		Log.v(TAG, "Email: " + email);
 		spreadsheetFactory = SpreadSheetFactory.getInstance(email, password);
 	}
 
@@ -163,8 +173,9 @@ public class EventManagerApp extends Application implements
 		
 		String spreadsheetTitle = prefs.getString((String) getText(R.string.credentialsKeySpreadsheetTitle), "event_manager");
 		Log.v(TAG, "Spreadsheet title: " + spreadsheetTitle);
-		ArrayList<SpreadSheet> spreadsheets = getSpreadsheetFactory().getAllSpreadSheets(true, spreadsheetTitle, true);
-		if (spreadsheets == null) {
+		ArrayList<SpreadSheet> spreadsheets = getSpreadsheetFactory().getSpreadSheet(spreadsheetTitle, false);
+		
+		if ((spreadsheets == null) || (spreadsheets.size() == 0)) {
 			Log.d(TAG, "No spreadsheet found. Creating new one.");
 			getSpreadsheetFactory().createSpreadSheet(spreadsheetTitle);
 			return 0;
@@ -190,9 +201,9 @@ public class EventManagerApp extends Application implements
 			record.put(DbHelper.EVENTS_DESCRIPTION, wsc.get(2).getValue());
 			record.put(DbHelper.EVENTS_CREATOR, wsc.get(3).getValue());
 			record.put(DbHelper.EVENTS_STARTING_TS,
-					Integer.parseInt(wsc.get(3).getValue()));
-			record.put(DbHelper.EVENTS_ENDING_TS,
 					Integer.parseInt(wsc.get(4).getValue()));
+			record.put(DbHelper.EVENTS_ENDING_TS,
+					Integer.parseInt(wsc.get(5).getValue()));
 			newEvents++;
 			try {
 				db.insertOrThrow(DbHelper.TABLE_EVENTS, null, record); // insert

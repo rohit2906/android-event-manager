@@ -33,7 +33,7 @@ public class EventsActivity extends Activity implements OnClickListener {
 	EventManagerApp app;
 	ListView eventList;
 
-	SQLiteDatabase db;
+//	SQLiteDatabase db;
 
 	IntentFilter filter;
 	EventsReceiver receiver;
@@ -70,9 +70,9 @@ public class EventsActivity extends Activity implements OnClickListener {
 		filter = new IntentFilter(PollerService.NEW_EVENTS_INTENT);
 		
 
-		// Open the db in readable mode
-		Log.d(TAG, "Open the database");
-		db = app.getDbHelper().getReadableDatabase();
+//		// Open the db in readable mode
+//		Log.d(TAG, "Open the database");
+//		db = app.getDbHelper().getReadableDatabase();
 	}
 
 	@Override
@@ -127,21 +127,23 @@ public class EventsActivity extends Activity implements OnClickListener {
 		unregisterReceiver(receiver);
 	}
 	
-	/**
-	 * Close the database
-	 */
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		Log.v(TAG, "onDestroy");
-		db.close();
-	}
+//	/**
+//	 * Close the database
+//	 */
+//	@Override
+//	protected void onDestroy() {
+//		Log.v(TAG, "onDestroy");
+//		db.close();
+//		super.onDestroy();
+//	}
 
 	/**
 	 * Responsible for fetching data and setting up the list and the adapter
 	 */
 	private void setupList() {
 		// Get the data
+		SQLiteDatabase db = app.getDbHelper().getReadableDatabase();
+		try {
 		cursor = db.query(DbHelper.TABLE_EVENTS, null, null, null, null, null,
 				DbHelper.EVENTS_STARTING_TS);
 		startManagingCursor(cursor);
@@ -149,6 +151,9 @@ public class EventsActivity extends Activity implements OnClickListener {
 		// Setup Adapter
 		adapter.setViewBinder(VIEW_BINDER);
 		eventList.setAdapter(adapter);
+		} finally {
+			db.close();
+		}
 	}
 
 	/**
