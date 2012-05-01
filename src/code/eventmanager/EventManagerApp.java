@@ -215,10 +215,12 @@ public class EventManagerApp extends Application implements
 																		// database
 				Log.v(TAG, "Record: " + wsc.get(0).toString() + " - "
 						+ wsc.get(1).toString() + " - " + wsc.get(4).toString());
+				
 			} catch (SQLException e) {
 				Log.w(TAG, "Record " + wsc.get(0).toString() + " skipped");
 
 			}
+			
 		}
 		db.close();
 		Log.d(TAG, "Events parsed");
