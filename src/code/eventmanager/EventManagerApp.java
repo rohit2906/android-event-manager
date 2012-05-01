@@ -198,12 +198,13 @@ public class EventManagerApp extends Application implements
 			record.put(DbHelper.EVENTS_ID,
 					Integer.parseInt(wsc.get(0).getValue()));
 			record.put(DbHelper.EVENTS_NAME, wsc.get(1).getValue());
-			record.put(DbHelper.EVENTS_DESCRIPTION, wsc.get(2).getValue());
-			record.put(DbHelper.EVENTS_CREATOR, wsc.get(3).getValue());
+			record.put(DbHelper.EVENTS_ADDRESS, wsc.get(2).getValue());
+			record.put(DbHelper.EVENTS_DESCRIPTION, wsc.get(3).getValue());
+			record.put(DbHelper.EVENTS_CREATOR, wsc.get(4).getValue());
 			record.put(DbHelper.EVENTS_STARTING_TS,
-					Integer.parseInt(wsc.get(4).getValue()));
-			record.put(DbHelper.EVENTS_ENDING_TS,
 					Integer.parseInt(wsc.get(5).getValue()));
+			record.put(DbHelper.EVENTS_ENDING_TS,
+					Integer.parseInt(wsc.get(6).getValue()));
 			newEvents++;
 			try {
 				db.insertOrThrow(DbHelper.TABLE_EVENTS, null, record); // insert
@@ -213,7 +214,7 @@ public class EventManagerApp extends Application implements
 																		// the
 																		// database
 				Log.v(TAG, "Record: " + wsc.get(0).toString() + " - "
-						+ wsc.get(1).toString() + " - " + wsc.get(3).toString());
+						+ wsc.get(1).toString() + " - " + wsc.get(4).toString());
 			} catch (SQLException e) {
 				Log.w(TAG, "Record " + wsc.get(0).toString() + " skipped");
 

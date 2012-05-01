@@ -20,21 +20,22 @@ import android.widget.TimePicker;
 
 public class NewEventActivity extends Activity implements OnClickListener {
 
-	private EditText titleNewEvent;
-	private EditText descriptionNewEvent;
+	private EditText etTitle;
+	private EditText etAddress;
+	private EditText etDescription;
 	private Button btnStartingDate;
 	private Button btnStartingTime;
 	private Button btnEndingDate;
 	private Button btnEndingTime;
+	private Button create_buttonNewEvent;
+	private Button cancel_buttonNewEvent;
+
 	private Date starting;
 	private Date ending;
-
-	static final int STARTING_DATE_DIALOG_ID = 0;
-	static final int STARTING_TIME_DIALOG_ID = 1;
-	static final int ENDING_DATE_DIALOG_ID = 2;
-	static final int ENDING_TIME_DIALOG_ID = 3;
-
-	Button create_buttonNewEvent;
+	private static final int STARTING_DATE_DIALOG_ID = 0;
+	private static final int STARTING_TIME_DIALOG_ID = 1;
+	private static final int ENDING_DATE_DIALOG_ID = 2;
+	private static final int ENDING_TIME_DIALOG_ID = 3;
 
 	public DbHelper dbHelper;
 
@@ -42,27 +43,35 @@ public class NewEventActivity extends Activity implements OnClickListener {
 
 	EventManagerApp app;
 
+	/**
+	 * Reference to widgets and registration to onClick listener. Create the
+	 * starting and ending time set for now. Update the buttons with the current
+	 * time.
+	 */
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-
 		super.onCreate(savedInstanceState);
-
 		Log.d(TAG, "onCreate");
 		setContentView(R.layout.newevent_layout);
 		app = (EventManagerApp) getApplication();
 
-		titleNewEvent = (EditText) findViewById(R.id.neweventEditTextTitle);
-		descriptionNewEvent = (EditText) findViewById(R.id.neweventEditTextDescription);
+		etTitle = (EditText) findViewById(R.id.neweventEditTextTitle);
+		etAddress = (EditText) findViewById(R.id.neweventEditTextAddress);
+		etDescription = (EditText) findViewById(R.id.neweventEditTextDescription);
 		btnStartingDate = (Button) findViewById(R.id.neweventButtonStartingDate);
 		btnStartingTime = (Button) findViewById(R.id.neweventButtonStartingTime);
 		btnEndingDate = (Button) findViewById(R.id.neweventButtonEndingDate);
 		btnEndingTime = (Button) findViewById(R.id.neweventButtonEndingTime);
-		create_buttonNewEvent = (Button) findViewById(R.id.neweventCreateButton);
+		create_buttonNewEvent = (Button) findViewById(R.id.neweventButtonCreate);
+		cancel_buttonNewEvent = (Button) findViewById(R.id.neweventButtonCancel);
 
 		btnStartingDate.setOnClickListener(this);
 		btnStartingTime.setOnClickListener(this);
 		btnEndingDate.setOnClickListener(this);
 		btnEndingTime.setOnClickListener(this);
+		create_buttonNewEvent.setOnClickListener(this);
+		cancel_buttonNewEvent.setOnClickListener(this);
 
 		starting = new Date();
 		ending = new Date();
@@ -73,9 +82,7 @@ public class NewEventActivity extends Activity implements OnClickListener {
 		updateDate(ending, btnEndingDate);
 		updateTime(ending, btnEndingTime);
 
-		create_buttonNewEvent.setOnClickListener(this);
 		dbHelper = new DbHelper(this);
-
 	}
 
 	/**
@@ -104,10 +111,13 @@ public class NewEventActivity extends Activity implements OnClickListener {
 	}
 
 	/**
-	 * Select which dialog to show based on the the parameter id of the showDialog() into the onClick method
+	 * Select which dialog to show based on the the parameter id of the
+	 * showDialog() into the onClick method
 	 */
 	@Override
 	protected Dialog onCreateDialog(int id) {
+		Log.i(TAG, "onCreateDialog");
+		Log.d(TAG, "Dialog id: " + id);
 		switch (id) {
 		case STARTING_DATE_DIALOG_ID:
 			return new DatePickerDialog(this, startingDateSetListener,
@@ -171,18 +181,27 @@ public class NewEventActivity extends Activity implements OnClickListener {
 		}
 	};
 
-	public long getTimeStamp(String myString) {
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm");
-		try {
-			Date parsedDate = dateFormat.parse(myString);
-			Timestamp timestamp = new Timestamp(parsedDate.getTime());
-			long time = timestamp.getTime();
-			return time;
-		} catch (Exception e) {
-			Log.d("TAG", "Non valable date format");
-			return -1;
-		}
-
+	/**
+	 * Convert a date into a timestamp
+	 * 
+	 * @param year
+	 * @param month
+	 * @param day
+	 * @param hour
+	 * @param minute
+	 * @return milliseconds
+	 */
+	private long date2Timestamp(int year, int month, int day, int hour,
+			int minute) {
+		Calendar c = Calendar.getInstance();
+		c.set(Calendar.YEAR, year);
+		c.set(Calendar.MONTH, month);
+		c.set(Calendar.DAY_OF_MONTH, day);
+		c.set(Calendar.HOUR, hour);
+		c.set(Calendar.MINUTE, minute);
+		c.set(Calendar.SECOND, 0);
+		c.set(Calendar.MILLISECOND, 0);
+		return c.getTimeInMillis();
 	}
 
 	/**
@@ -190,7 +209,7 @@ public class NewEventActivity extends Activity implements OnClickListener {
 	 */
 	@Override
 	public void onClick(View v) {
-
+		Log.i(TAG, "onClick");
 		switch (v.getId()) {
 		case R.id.neweventButtonStartingDate:
 			showDialog(STARTING_DATE_DIALOG_ID);
@@ -204,21 +223,24 @@ public class NewEventActivity extends Activity implements OnClickListener {
 		case R.id.neweventButtonEndingTime:
 			showDialog(ENDING_TIME_DIALOG_ID);
 			break;
-		case R.id.neweventCreateButton:
-			/*record.put(DbHelper.EVENTS_NAME, titleNewEvent.getText().toString());
-			 record.put(DbHelper.EVENTS_DESCRIPTION, descriptionNewEvent.getText().toString()); // record.put(DbHelper.EVENTS_CREATOR,
-			 app.getSpreadsheetFactory().);
-			 record.put(DbHelper.EVENTS_STARTING_TS,
-			 getTimeStamp(starting_hourNewEvent.getText().toString()));
-			 record.put(DbHelper.EVENTS_ENDING_TS,
-			 getTimeStamp(ending_hourNewEvent .getText().toString()));*/
+		case R.id.neweventButtonCreate:
+			/*
+			 * record.put(DbHelper.EVENTS_NAME,
+			 * titleNewEvent.getText().toString());
+			 * record.put(DbHelper.EVENTS_DESCRIPTION,
+			 * descriptionNewEvent.getText().toString()); //
+			 * record.put(DbHelper.EVENTS_CREATOR,
+			 * app.getSpreadsheetFactory().);
+			 * record.put(DbHelper.EVENTS_STARTING_TS,
+			 * getTimeStamp(starting_hourNewEvent.getText().toString()));
+			 * record.put(DbHelper.EVENTS_ENDING_TS,
+			 * getTimeStamp(ending_hourNewEvent .getText().toString()));
+			 */
 			break;
+		case R.id.neweventButtonCancel:
+			finish();
 		default:
 			break;
 		}
-
-		/*
-		 * 
-		 */
 	}
 }
