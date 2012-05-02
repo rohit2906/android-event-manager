@@ -2,7 +2,9 @@ package code.eventmanager;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 
+import code.eventmanager.NewEventActivity.UpdateSpreadsheet;
 import code.eventmanager.auth.AndroidAuthenticator;
 import com.pras.SpreadSheet;
 import com.pras.SpreadSheetFactory;
@@ -22,6 +24,7 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.text.format.DateUtils;
 import android.util.Log;
@@ -42,7 +45,6 @@ public class EventManagerApp extends Application implements
 	private int lastSavedEventId = -1;
 	private String spreadSheetKey;
 	public DbHelper dbHelper;
-	
 
 	private static final int ALARM_DISABLED = 0;
 
@@ -432,27 +434,13 @@ public class EventManagerApp extends Application implements
 		// delete the event from the spreadsheet
 		if (eventsDeleted > 0) {
 			Log.d(TAG, "Event deleted from the database");
-			WorkSheet ws=getWorkSheet();
-			ArrayList<WorkSheetRow> rows =ws.getData(false);
-			WorkSheetRow wsr = null;
-			for (int i = 0; i < rows.size(); i++) {
-				ArrayList<WorkSheetCell> wsc = rows.get(i).getCells();
-				// Put in the database only the new events
-				if (wsc.get(0).getValue() == Integer.toString(id)) {
-					wsr = rows.get(i);
-					break;
-				}
-			}
-			if (wsr == null) {
-				Log.w(TAG, "Problems with get the event from the spreadsheet");
-				return false;
-			}
-			ws.deleteListRow(spreadSheetKey, wsr);
-			Log.d(TAG, "Event deleted from the spreadsheet");
-			return true;
+			Integer[] arrayId= new Integer[1];
+			arrayId[0]=id;
+			new DeleteEventOnSpreadsheet().execute(arrayId);
 		}
 		Log.w(TAG, "Problems deleting the event in the database");
 		return false;
+
 	}
 
 	/**
@@ -478,8 +466,8 @@ public class EventManagerApp extends Application implements
 			createWebSpreadSheet(spreadsheetTitle);
 			Log.d(TAG, "New Spreadsheet and Worksheet created and initialized.");
 		}
-		spreadSheetKey=spreadsheets.get(0).getKey();
-		
+		spreadSheetKey = spreadsheets.get(0).getKey();
+
 		// Get the lastSavedEventId from database if it is the first loop of the
 		// parsing
 		if (lastSavedEventId == -1)
@@ -489,4 +477,32 @@ public class EventManagerApp extends Application implements
 		return spreadsheets.get(0).getAllWorkSheets().get(0);
 	}
 
+	/**
+	 * This class create an async task in order to delete an event on the
+	 * spreadsheet online
+	 * 
+	 */
+	class DeleteEventOnSpreadsheet extends AsyncTask<Integer, Boolean, String> {
+
+		@Override
+		protected String doInBackground(Integer... params) {
+			WorkSheet ws = getWorkSheet();
+			ArrayList<WorkSheetRow> rows = ws.getData(false);
+			WorkSheetRow wsr = null;
+			for (int i = 0; i < rows.size(); i++) {
+				ArrayList<WorkSheetCell> wsc = rows.get(i).getCells();
+				// Put in the database only the new events
+				if (wsc.get(0).getValue() == Integer.toString(params[0])) {
+					wsr = rows.get(i);
+					break;
+				}
+			}
+			if (wsr == null) {
+				Log.w(TAG, "Problems with get the event from the spreadsheet");
+			}
+			ws.deleteListRow(spreadSheetKey, wsr);
+			Log.d(TAG, "Event deleted from the spreadsheet");
+			return "";
+		}
+	}
 }
