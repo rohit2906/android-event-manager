@@ -3,7 +3,6 @@ package code.eventmanager;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;

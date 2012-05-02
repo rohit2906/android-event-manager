@@ -32,7 +32,7 @@ import android.util.Log;
  * other activities
  */
 public class EventManagerApp extends Application implements
-OnSharedPreferenceChangeListener {
+		OnSharedPreferenceChangeListener {
 
 	private static final String TAG = EventManagerApp.class.getSimpleName();
 
@@ -40,8 +40,10 @@ OnSharedPreferenceChangeListener {
 	private SpreadSheetFactory spreadsheetFactory;
 	private AlarmManager alarmManager;
 	private int lastSavedEventId = -1;
+	private String spreadSheetKey;
 	public DbHelper dbHelper;
 	
+
 	private static final int ALARM_DISABLED = 0;
 
 	/**
@@ -56,7 +58,7 @@ OnSharedPreferenceChangeListener {
 		this.prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		this.prefs.registerOnSharedPreferenceChangeListener(this);
 		dbHelper = new DbHelper(this);
-		
+
 		// Get the alarm service from the system
 		alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 	}
@@ -86,13 +88,18 @@ OnSharedPreferenceChangeListener {
 			if (defaultAccount == true) {
 				setDefaultAccount();
 			} else {
-				// check if user e-mail and password are emptyString email = prefs.getString(
-				String email = prefs.getString(
-						(String) getText(R.string.preferencesKeyCustomAccountMail), "");
-				String password = prefs.getString(
-						(String) getText(R.string.preferencesKeyCustomAccountPassword), "");
+				// check if user e-mail and password are emptyString email =
+				// prefs.getString(
+				String email = prefs
+						.getString(
+								(String) getText(R.string.preferencesKeyCustomAccountMail),
+								"");
+				String password = prefs
+						.getString(
+								(String) getText(R.string.preferencesKeyCustomAccountPassword),
+								"");
 
-				if (email.isEmpty() || password.isEmpty()) 
+				if (email.isEmpty() || password.isEmpty())
 					Log.i(TAG, "No account set");
 				else
 					setAnotherAccount(email, password);
@@ -102,12 +109,14 @@ OnSharedPreferenceChangeListener {
 		// check if the user type a new username or password for the custom
 		// account
 		else if (key == getText(R.string.preferencesKeyCustomAccountMail)
-				|| key == getText(R.string.preferencesKeyCustomAccountPassword))
-		{
+				|| key == getText(R.string.preferencesKeyCustomAccountPassword)) {
 			String email = prefs.getString(
-					(String) getText(R.string.preferencesKeyCustomAccountMail), "");
-			String password = prefs.getString(
-					(String) getText(R.string.preferencesKeyCustomAccountPassword), "");
+					(String) getText(R.string.preferencesKeyCustomAccountMail),
+					"");
+			String password = prefs
+					.getString(
+							(String) getText(R.string.preferencesKeyCustomAccountPassword),
+							"");
 
 			if (email != "" && password != "")
 				setAnotherAccount(email, password);
@@ -149,8 +158,10 @@ OnSharedPreferenceChangeListener {
 	/**
 	 * Allocate a new SpreadSheetFactory for the new custom account
 	 * 
-	 * @param email username
-	 * @param password password
+	 * @param email
+	 *            username
+	 * @param password
+	 *            password
 	 */
 	public void setAnotherAccount(String email, String password) {
 		Log.d(TAG, "Setting up custom account");
@@ -161,100 +172,91 @@ OnSharedPreferenceChangeListener {
 	/**
 	 * Parse the events in the spreadsheet
 	 * 
-	 * @param spreadsheet the spreadsheet with events
-	 * @param worksheet the spreadsheet with events
+	 * @param spreadsheet
+	 *            the spreadsheet with events
+	 * @param worksheet
+	 *            the spreadsheet with events
 	 */
 	public int parseEvents() {
-		if (getSpreadsheetFactory() == null) {
-			Log.w(TAG, "No account set");
-			return -1;
-		}
-
-		String spreadsheetTitle = prefs.getString((String) getText(R.string.preferencesKeySpreadsheetTitle), "event_manager");
-		Log.v(TAG, "Spreadsheet title: " + spreadsheetTitle);
-		ArrayList<SpreadSheet> spreadsheets = getSpreadsheetFactory().getSpreadSheet(spreadsheetTitle, false);
-
-		if ((spreadsheets == null) || (spreadsheets.size() == 0)) {
-			Log.d(TAG, "No spreadsheet found.");
-			createWebSpreadSheet(spreadsheetTitle);
-			Log.d(TAG, "New Spreadsheet and Worksheet created and initialized.");
-
-			// Zero new events, of course
-			return 0;
-		}
-		
-		// Get the lastSavedEventId from database if it is the first loop of the parsing
-		if (lastSavedEventId == -1)
-			lastSavedEventId = getMaxEventId(null);
-
-		Log.d(TAG, "Spreadsheets found. Parsing events ...");
-		WorkSheet ws = spreadsheets.get(0).getAllWorkSheets().get(0);
+		WorkSheet ws = getWorkSheet();
 		ArrayList<WorkSheetRow> rows = ws.getData(false);
 		Log.v(TAG, "Number of rows: " + rows.size());
-		
-		int maxId = lastSavedEventId;ContentValues record = new ContentValues();
+
+		int maxId = lastSavedEventId;
+		ContentValues record = new ContentValues();
 		int newEvents = 0;
-		
+
 		for (int i = 0; i < rows.size(); i++) {
-			ArrayList<WorkSheetCell> wsc = rows.get(i).getCells(); // get the cells in that row
+			ArrayList<WorkSheetCell> wsc = rows.get(i).getCells(); // get the
+																	// cells in
+																	// that row
 			int id = Integer.parseInt(wsc.get(0).getValue());
-			
+
 			// Put in the database only the new events
 			if (id > maxId) {
 				maxId = id;
-				
+
 				// clear the database record
 				record.clear();
-				
+
 				record.put(DbHelper.EVENT_ID, id);
 				record.put(DbHelper.EVENT_NAME, wsc.get(1).getValue());
 				record.put(DbHelper.EVENT_ADDRESS, wsc.get(2).getValue());
 				record.put(DbHelper.EVENT_DESCRIPTION, wsc.get(3).getValue());
 				record.put(DbHelper.EVENT_CREATOR, wsc.get(4).getValue());
-				record.put(DbHelper.EVENT_STARTING_TS, Long.parseLong(wsc.get(5).getValue()));
-				record.put(DbHelper.EVENT_ENDING_TS, Long.parseLong(wsc.get(6).getValue()));
-				
+				record.put(DbHelper.EVENT_STARTING_TS,
+						Long.parseLong(wsc.get(5).getValue()));
+				record.put(DbHelper.EVENT_ENDING_TS,
+						Long.parseLong(wsc.get(6).getValue()));
+
 				if (insertOrIgnore(record))
 					newEvents++;
 			}
 		}
-		
+
 		lastSavedEventId = maxId;
 		return newEvents;
 	}
-	
+
 	/**
-	 * Set the alarm for the poller getting the interval value from the preferences
+	 * Set the alarm for the poller getting the interval value from the
+	 * preferences
 	 */
 	public void setAlarmForPollerFromPreferences() {
-		Log.d(TAG, "Updating poller alarm");		
-		int minutes = Integer.parseInt(prefs.getString(getText(R.string.preferencesKeyMinutesBetweenUpdates).toString().trim(), "1"));
+		Log.d(TAG, "Updating poller alarm");
+		int minutes = Integer.parseInt(prefs.getString(
+				getText(R.string.preferencesKeyMinutesBetweenUpdates)
+						.toString().trim(), "1"));
 		if (minutes >= 0)
 			setPollerAlarm(minutes);
 	}
-	
+
 	/**
 	 * Set the poller alarm
 	 * 
-	 * @param minutes the minutes between every launch
+	 * @param minutes
+	 *            the minutes between every launch
 	 */
 	private void setPollerAlarm(int minutes) {
 		if (minutes < 0)
 			return;
-		
+
 		Intent intent = new Intent(this, PollerService.class);
 		PendingIntent pollerTriggerPendingIntent = PendingIntent.getService(
-						getApplicationContext(), -1, intent,
-						PendingIntent.FLAG_UPDATE_CURRENT);
-		
+				getApplicationContext(), -1, intent,
+				PendingIntent.FLAG_UPDATE_CURRENT);
+
 		if (minutes == ALARM_DISABLED) {
 			alarmManager.cancel(pollerTriggerPendingIntent);
 			Log.v(TAG, "Automatic updates disabled");
 		} else {
 			// set the alarm (it could be approximately).
-			// RTC means that the alarm'll not wake up the device if it's sleeping. The next
+			// RTC means that the alarm'll not wake up the device if it's
+			// sleeping. The next
 			// parameter specifies the time is in milliseconds.
-			alarmManager.setInexactRepeating(AlarmManager.RTC, System.currentTimeMillis(), minutes * 60000, pollerTriggerPendingIntent);
+			alarmManager.setInexactRepeating(AlarmManager.RTC,
+					System.currentTimeMillis(), minutes * 60000,
+					pollerTriggerPendingIntent);
 			Log.v(TAG, "Alarm set every " + minutes + " minutes");
 		}
 	}
@@ -267,7 +269,7 @@ OnSharedPreferenceChangeListener {
 	public DbHelper getDbHelper() {
 		return dbHelper;
 	}
-	
+
 	/**
 	 * Return all the events.
 	 * 
@@ -280,36 +282,41 @@ OnSharedPreferenceChangeListener {
 	/**
 	 * Insert the values in the database ignoring the conflicts.
 	 * 
-	 * @param values the ContentValues to insert in the database.
-	 *
+	 * @param values
+	 *            the ContentValues to insert in the database.
+	 * 
 	 * @return true if inserted, false if ignored.
 	 */
 	public boolean insertOrIgnore(ContentValues values) {
 		boolean valuesInserted = false;
 		SQLiteDatabase db = getDbHelper().getWritableDatabase();
-		
+
 		try {
 			db.insertWithOnConflict(DbHelper.TABLE_EVENTS, null, values,
 					SQLiteDatabase.CONFLICT_IGNORE);
-			Log.v(TAG, "Record " + values.getAsString(DbHelper.EVENT_ID) + " added.");
+			Log.v(TAG, "Record " + values.getAsString(DbHelper.EVENT_ID)
+					+ " added.");
 			valuesInserted = true;
 		} catch (SQLException e) {
-			Log.v(TAG, "Record " + values.getAsString(DbHelper.EVENT_ID) + " ignored.");
+			Log.v(TAG, "Record " + values.getAsString(DbHelper.EVENT_ID)
+					+ " ignored.");
 		} finally {
 			db.close();
 		}
-		
+
 		return valuesInserted;
 	}
-	
+
 	/**
 	 * Create and initialize the Spreadsheet and the Worksheet on Google Docs
+	 * 
 	 * @param spreadsheetTitle
 	 */
 	private void createWebSpreadSheet(String spreadsheetTitle) {
 		getSpreadsheetFactory().createSpreadSheet(spreadsheetTitle);
-		ArrayList<SpreadSheet> spreadsheets = getSpreadsheetFactory().getSpreadSheet(spreadsheetTitle, false);
-		
+		ArrayList<SpreadSheet> spreadsheets = getSpreadsheetFactory()
+				.getSpreadSheet(spreadsheetTitle, false);
+
 		String[] columns = new String[7];
 		columns[0] = DbHelper.EVENT_ID;
 		columns[1] = DbHelper.EVENT_NAME;
@@ -318,38 +325,41 @@ OnSharedPreferenceChangeListener {
 		columns[4] = DbHelper.EVENT_CREATOR;
 		columns[5] = DbHelper.EVENT_STARTING_TS;
 		columns[6] = DbHelper.EVENT_ENDING_TS;
-		
+
 		spreadsheets.get(0).addWorkSheet(spreadsheetTitle, columns);
-		spreadsheets.get(0).deleteWorkSheet(spreadsheets.get(0).getAllWorkSheets().get(0));
+		spreadsheets.get(0).deleteWorkSheet(
+				spreadsheets.get(0).getAllWorkSheets().get(0));
 	}
-	
+
 	/**
 	 * Return the current maximum Event ID in the database.
 	 * 
-	 * @param db an already opened database or null if you don't have one already opened.
-	 * @return the current maximum Event ID in the database or -1 if there are no entries.
+	 * @param db
+	 *            an already opened database or null if you don't have one
+	 *            already opened.
+	 * @return the current maximum Event ID in the database or -1 if there are
+	 *         no entries.
 	 */
 	public int getMaxEventId(SQLiteDatabase db) {
-		boolean dbAlreadyOpen = true;		
-		
+		boolean dbAlreadyOpen = true;
+
 		if (db == null) {
 			dbAlreadyOpen = false;
 			db = getDbHelper().getReadableDatabase();
 		}
-		
+
 		String query = "SELECT MAX(" + DbHelper.EVENT_ID + ") FROM "
 				+ DbHelper.TABLE_EVENTS;
-		
+
 		Cursor cursor = db.rawQuery(query, null);
 		int max = (cursor.moveToFirst() ? cursor.getInt(0) : -1);
-		
+
 		if (!dbAlreadyOpen)
 			db.close();
-		
+
 		return max;
 	}
-	
-	
+
 	/**
 	 * Convert a date into a timestamp
 	 * 
@@ -361,7 +371,8 @@ OnSharedPreferenceChangeListener {
 	 * 
 	 * @return milliseconds
 	 */
-	public long date2Timestamp(int year, int month, int day, int hour, int minute) {
+	public long date2Timestamp(int year, int month, int day, int hour,
+			int minute) {
 		Calendar c = Calendar.getInstance();
 		c.set(Calendar.YEAR, year);
 		c.set(Calendar.MONTH, month);
@@ -372,14 +383,12 @@ OnSharedPreferenceChangeListener {
 		c.set(Calendar.MILLISECOND, 0);
 		return c.getTimeInMillis();
 	}
-	
+
 	public CharSequence timestamp2Date(long timestamp) {
 		CharSequence realTime = DateUtils.getRelativeTimeSpanString(
 				getApplicationContext(), timestamp);
 		return realTime;
 	}
-
-
 
 	/**
 	 * Check which account is in use and return the email of the user.
@@ -397,14 +406,87 @@ OnSharedPreferenceChangeListener {
 			AccountManager manager = AccountManager
 					.get(getApplicationContext());
 			creator = manager.getAccountsByType("com.google")[0].name;
-		} 
-		else {
+		} else {
 			creator = this.getPrefs().getString(
 					getText(R.string.preferencesKeyCustomAccountMail)
 							.toString(), "");
 		}
 
 		return creator;
+	}
+
+	/**
+	 * Delete an event from the database and from the online spreadsheet
+	 * 
+	 * @param id
+	 *            The id of the event
+	 * @return the outcome of the operation
+	 */
+	public boolean deleteEvent(int id) {
+		// delete the event from the database
+		SQLiteDatabase db = getDbHelper().getWritableDatabase();
+		int eventsDeleted = db.delete(DbHelper.TABLE_EVENTS, DbHelper.EVENT_ID
+				+ "=?", new String[] { Integer.toString(id) });
+		db.close();
+
+		// delete the event from the spreadsheet
+		if (eventsDeleted > 0) {
+			Log.d(TAG, "Event deleted from the database");
+			WorkSheet ws=getWorkSheet();
+			ArrayList<WorkSheetRow> rows =ws.getData(false);
+			WorkSheetRow wsr = null;
+			for (int i = 0; i < rows.size(); i++) {
+				ArrayList<WorkSheetCell> wsc = rows.get(i).getCells();
+				// Put in the database only the new events
+				if (wsc.get(0).getValue() == Integer.toString(id)) {
+					wsr = rows.get(i);
+					break;
+				}
+			}
+			if (wsr == null) {
+				Log.w(TAG, "Problems with get the event from the spreadsheet");
+				return false;
+			}
+			ws.deleteListRow(spreadSheetKey, wsr);
+			Log.d(TAG, "Event deleted from the spreadsheet");
+			return true;
+		}
+		Log.w(TAG, "Problems deleting the event in the database");
+		return false;
+	}
+
+	/**
+	 * get the current worksheet from the spreadsheet
+	 * 
+	 * @return current worksheet
+	 */
+	private WorkSheet getWorkSheet() {
+		if (getSpreadsheetFactory() == null) {
+			Log.w(TAG, "No account set");
+			return null;
+		}
+
+		String spreadsheetTitle = prefs.getString(
+				(String) getText(R.string.preferencesKeySpreadsheetTitle),
+				"event_manager");
+		Log.v(TAG, "Spreadsheet title: " + spreadsheetTitle);
+		ArrayList<SpreadSheet> spreadsheets = getSpreadsheetFactory()
+				.getSpreadSheet(spreadsheetTitle, false);
+
+		if ((spreadsheets == null) || (spreadsheets.size() == 0)) {
+			Log.d(TAG, "No spreadsheet found.");
+			createWebSpreadSheet(spreadsheetTitle);
+			Log.d(TAG, "New Spreadsheet and Worksheet created and initialized.");
+		}
+		spreadSheetKey=spreadsheets.get(0).getKey();
+		
+		// Get the lastSavedEventId from database if it is the first loop of the
+		// parsing
+		if (lastSavedEventId == -1)
+			lastSavedEventId = getMaxEventId(null);
+
+		Log.d(TAG, "Spreadsheets found.");
+		return spreadsheets.get(0).getAllWorkSheets().get(0);
 	}
 
 }

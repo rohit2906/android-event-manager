@@ -1,8 +1,10 @@
 package code.eventmanager;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
@@ -16,17 +18,18 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+import android.widget.SimpleCursorAdapter.ViewBinder;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.SimpleCursorAdapter.ViewBinder;
 
 /**
  * Manage the events displaying
  */
-public class EventsActivity extends Activity implements OnClickListener, OnItemClickListener {
+public class EventsActivity extends Activity implements OnClickListener, OnItemLongClickListener, OnItemClickListener {
 
 	private static final String TAG = EventsActivity.class.getSimpleName();
 	static final String SEND_EVENTS_NOTIFICATIONS = "code.eventmanager.SEND_EVENTS_NOTIFICATIONS";
@@ -196,6 +199,28 @@ public class EventsActivity extends Activity implements OnClickListener, OnItemC
 				setupList();
 			}
 		}
+	}
+	
+	
+
+	@Override
+	public boolean onItemLongClick(AdapterView<?> a, View v, int position,
+			long id) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage("Are you sure you want to delete it?")
+		       .setCancelable(false)
+		       .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+		           public void onClick(DialogInterface dialog, int id) {
+		                app.deleteEvent(id);
+		           }
+		       })
+		       .setNegativeButton("No", new DialogInterface.OnClickListener() {
+		           public void onClick(DialogInterface dialog, int id) {
+		                dialog.cancel();
+		           }
+		       });
+		AlertDialog alert = builder.create();
+		return false;
 	}
 
 	@Override
