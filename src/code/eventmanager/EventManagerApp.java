@@ -1,6 +1,8 @@
 package code.eventmanager;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+
 import code.eventmanager.auth.AndroidAuthenticator;
 import com.pras.SpreadSheet;
 import com.pras.SpreadSheetFactory;
@@ -20,6 +22,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.preference.PreferenceManager;
+import android.text.format.DateUtils;
 import android.util.Log;
 
 /**
@@ -343,5 +346,34 @@ OnSharedPreferenceChangeListener {
 			db.close();
 		
 		return max;
+	}
+	
+	/**
+	 * Convert a date into a timestamp
+	 * 
+	 * @param year
+	 * @param month
+	 * @param day
+	 * @param hour
+	 * @param minute
+	 * 
+	 * @return milliseconds
+	 */
+	public long date2Timestamp(int year, int month, int day, int hour, int minute) {
+		Calendar c = Calendar.getInstance();
+		c.set(Calendar.YEAR, year);
+		c.set(Calendar.MONTH, month);
+		c.set(Calendar.DAY_OF_MONTH, day);
+		c.set(Calendar.HOUR, hour);
+		c.set(Calendar.MINUTE, minute);
+		c.set(Calendar.SECOND, 0);
+		c.set(Calendar.MILLISECOND, 0);
+		return c.getTimeInMillis();
+	}
+	
+	public CharSequence timestamp2Date(long timestamp) {
+		CharSequence realTime = DateUtils.getRelativeTimeSpanString(
+				getApplicationContext(), timestamp);
+		return realTime;
 	}
 }

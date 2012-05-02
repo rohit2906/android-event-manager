@@ -1,10 +1,8 @@
 package code.eventmanager;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-
 import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.DatePickerDialog;
@@ -196,28 +194,7 @@ public class NewEventActivity extends Activity implements OnClickListener {
 		}
 	};
 
-	/**
-	 * Convert a date into a timestamp
-	 * 
-	 * @param year
-	 * @param month
-	 * @param day
-	 * @param hour
-	 * @param minute
-	 * 
-	 * @return milliseconds
-	 */
-	private long date2Timestamp(int year, int month, int day, int hour, int minute) {
-		Calendar c = Calendar.getInstance();
-		c.set(Calendar.YEAR, year);
-		c.set(Calendar.MONTH, month);
-		c.set(Calendar.DAY_OF_MONTH, day);
-		c.set(Calendar.HOUR, hour);
-		c.set(Calendar.MINUTE, minute);
-		c.set(Calendar.SECOND, 0);
-		c.set(Calendar.MILLISECOND, 0);
-		return c.getTimeInMillis();
-	}
+	
 
 	/**
 	 * Check which account is in use and return the email of the user.
@@ -272,8 +249,8 @@ public class NewEventActivity extends Activity implements OnClickListener {
 			String dataAddress = etAddress.getText().toString();
 			String dataDescription = etDescription.getText().toString();
 			String dataCreator = getCreator();
-			long dataStartingTS = date2Timestamp(starting.getYear(), starting.getMonth(), starting.getDate(), starting.getHours(), starting.getMinutes());
-			long dataEndingTS = date2Timestamp(ending.getYear(), ending.getMonth(), ending.getDate(), ending.getHours(), ending.getMinutes());
+			long dataStartingTS = app.date2Timestamp(starting.getYear(), starting.getMonth(), starting.getDate(), starting.getHours(), starting.getMinutes());
+			long dataEndingTS = app.date2Timestamp(ending.getYear(), ending.getMonth(), ending.getDate(), ending.getHours(), ending.getMinutes());
 
 			record.put(DbHelper.EVENT_NAME, dataName);
 			record.put(DbHelper.EVENT_ADDRESS, dataAddress);
