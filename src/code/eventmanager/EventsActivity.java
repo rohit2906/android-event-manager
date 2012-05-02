@@ -19,6 +19,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.SimpleCursorAdapter.ViewBinder;
 
 /**
@@ -27,13 +28,14 @@ import android.widget.SimpleCursorAdapter.ViewBinder;
 public class EventsActivity extends Activity implements OnClickListener {
 
 	private static final String TAG = EventsActivity.class.getSimpleName();
+	private static final int NEW_EVENT_ACTIVITY_CODE = 0;
 
 	Button buttonNewEvent;
 	Intent pollerServiceIntent;
 	EventManagerApp app;
 	ListView eventList;
 
-//	SQLiteDatabase db;
+	// SQLiteDatabase db;
 
 	IntentFilter filter;
 	EventsReceiver receiver;
@@ -51,7 +53,7 @@ public class EventsActivity extends Activity implements OnClickListener {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.events_layout);
-		
+
 		Log.i(TAG, "onCreate");
 
 		app = (EventManagerApp) getApplication();
@@ -68,19 +70,29 @@ public class EventsActivity extends Activity implements OnClickListener {
 		Log.d(TAG, "Set the receiver and the filter");
 		receiver = new EventsReceiver();
 		filter = new IntentFilter(PollerService.NEW_EVENTS_INTENT);
-		
 
-//		// Open the db in readable mode
-//		Log.d(TAG, "Open the database");
-//		db = app.getDbHelper().getReadableDatabase();
+		// // Open the db in readable mode
+		// Log.d(TAG, "Open the database");
+		// db = app.getDbHelper().getReadableDatabase();
 	}
 
 	@Override
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.eventsButtonNewEvent:
-			startActivity(new Intent(this, NewEventActivity.class));
+			startActivityForResult(new Intent(this, NewEventActivity.class),
+					NEW_EVENT_ACTIVITY_CODE);
 			break;
+		}
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (requestCode == NEW_EVENT_ACTIVITY_CODE) {
+			if(resultCode==0)
+				Toast.makeText(this, "Event created", Toast.LENGTH_LONG).show();
+			else
+				Toast.makeText(this, "Problems with the creation of the event. Try again.", Toast.LENGTH_LONG).show();
 		}
 	}
 
@@ -101,7 +113,8 @@ public class EventsActivity extends Activity implements OnClickListener {
 			startService(new Intent(this, PollerService.class));
 			break;
 		case R.id.menuItemNewEvent:
-			startActivity(new Intent(this, NewEventActivity.class));
+			startActivityForResult(new Intent(this, NewEventActivity.class),
+					NEW_EVENT_ACTIVITY_CODE);
 			break;
 		}
 		return true;
@@ -126,16 +139,16 @@ public class EventsActivity extends Activity implements OnClickListener {
 		Log.v(TAG, "onPause");
 		unregisterReceiver(receiver);
 	}
-	
-//	/**
-//	 * Close the database
-//	 */
-//	@Override
-//	protected void onDestroy() {
-//		Log.v(TAG, "onDestroy");
-//		db.close();
-//		super.onDestroy();
-//	}
+
+	// /**
+	// * Close the database
+	// */
+	// @Override
+	// protected void onDestroy() {
+	// Log.v(TAG, "onDestroy");
+	// db.close();
+	// super.onDestroy();
+	// }
 
 	/**
 	 * Responsible for fetching data and setting up the list and the adapter
@@ -144,32 +157,33 @@ public class EventsActivity extends Activity implements OnClickListener {
 		// Get the data
 		SQLiteDatabase db = app.getDbHelper().getReadableDatabase();
 		try {
-		cursor = db.query(DbHelper.TABLE_EVENTS, null, null, null, null, null,
-				DbHelper.EVENTS_STARTING_TS);
-		startManagingCursor(cursor);
+			cursor = db.query(DbHelper.TABLE_EVENTS, null, null, null, null,
+					null, DbHelper.EVENTS_STARTING_TS);
+			startManagingCursor(cursor);
 
-		// Setup Adapter
-		adapter.setViewBinder(VIEW_BINDER);
-		eventList.setAdapter(adapter);
+			// Setup Adapter
+			adapter.setViewBinder(VIEW_BINDER);
+			eventList.setAdapter(adapter);
 		} finally {
 			db.close();
 		}
 	}
 
 	/**
-	 * New ViewBinder in order to override the setViewValue method to display the time.
+	 * New ViewBinder in order to override the setViewValue method to display
+	 * the time.
 	 */
 	static final ViewBinder VIEW_BINDER = new ViewBinder() {
 
 		@Override
 		public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
-			
-			//check if the view to bind is one of the time textview widgets
+
+			// check if the view to bind is one of the time textview widgets
 			if (view.getId() != R.id.eventRowTvStarting
 					&& view.getId() != R.id.eventRowTvEnding)
 				return false;
 
-			//convert the timestamp into a real time way
+			// convert the timestamp into a real time way
 			long timestamp = cursor.getLong(columnIndex);
 			CharSequence realTime = DateUtils.getRelativeTimeSpanString(
 					view.getContext(), timestamp);

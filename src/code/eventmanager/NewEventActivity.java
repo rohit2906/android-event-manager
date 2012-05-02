@@ -102,6 +102,7 @@ public class NewEventActivity extends Activity implements OnClickListener {
 	 *            the button on which write the date
 	 */
 	private void updateDate(Date date, Button button) {
+		Log.v(TAG, "Update date on the button");
 		button.setText(date.getDate() + "-" + (date.getMonth() + 1) + "-"
 				+ (date.getYear() + 1900));
 	}
@@ -115,6 +116,7 @@ public class NewEventActivity extends Activity implements OnClickListener {
 	 *            the button on which write the time
 	 */
 	private void updateTime(Date time, Button button) {
+		Log.v(TAG, "Update time on the button");
 		button.setText(time.getHours() + ":" + time.getMinutes());
 	}
 
@@ -149,6 +151,7 @@ public class NewEventActivity extends Activity implements OnClickListener {
 	private DatePickerDialog.OnDateSetListener startingDateSetListener = new DatePickerDialog.OnDateSetListener() {
 		public void onDateSet(DatePicker view, int year, int monthOfYear,
 				int dayOfMonth) {
+			Log.v(TAG, "Setting starting date");
 			starting.setYear(year - 1900);
 			starting.setMonth(monthOfYear);
 			starting.setDate(dayOfMonth);
@@ -161,6 +164,7 @@ public class NewEventActivity extends Activity implements OnClickListener {
 
 		@Override
 		public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+			Log.v(TAG, "Setting starting time");
 			starting.setHours(hourOfDay);
 			starting.setMinutes(minute);
 			updateTime(starting, btnStartingTime);
@@ -171,6 +175,7 @@ public class NewEventActivity extends Activity implements OnClickListener {
 	private DatePickerDialog.OnDateSetListener endingDateSetListener = new DatePickerDialog.OnDateSetListener() {
 		public void onDateSet(DatePicker view, int year, int monthOfYear,
 				int dayOfMonth) {
+			Log.v(TAG, "Setting ending date");
 			ending.setYear(year - 1900);
 			ending.setMonth(monthOfYear);
 			ending.setDate(dayOfMonth);
@@ -183,6 +188,7 @@ public class NewEventActivity extends Activity implements OnClickListener {
 
 		@Override
 		public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+			Log.v(TAG, "Setting ending time");
 			ending.setHours(hourOfDay);
 			ending.setMinutes(minute);
 			updateTime(ending, btnEndingTime);
@@ -212,6 +218,11 @@ public class NewEventActivity extends Activity implements OnClickListener {
 		return c.getTimeInMillis();
 	}
 
+	/**
+	 * Check which account is in use and return the email of the user.
+	 * 
+	 * @return the email of the user, that is the creator of the event
+	 */
 	private String getCreator() {
 		String creator;
 		boolean checked = app.getPrefs()
@@ -233,7 +244,7 @@ public class NewEventActivity extends Activity implements OnClickListener {
 	}
 
 	/**
-	 * catch the click of the dates, times, create buttons
+	 * Catch the click of the dates, times, create buttons
 	 */
 	@Override
 	public void onClick(View v) {
@@ -253,27 +264,21 @@ public class NewEventActivity extends Activity implements OnClickListener {
 			break;
 		case R.id.neweventButtonCreate:
 
-			SQLiteDatabase db = app.getDbHelper().getWritableDatabase(); // open
-																			// the
-																			// database
+			SQLiteDatabase db = app.getDbHelper().getWritableDatabase();
 			ContentValues record = new ContentValues();
 
+			// save into the database
 			record.put(DbHelper.EVENTS_NAME, etTitle.getText().toString());
-
 			record.put(DbHelper.EVENTS_ADDRESS, etAddress.getText().toString());
-
 			record.put(DbHelper.EVENTS_DESCRIPTION, etDescription.getText()
-					.toString());//
-
+					.toString());
 			record.put(DbHelper.EVENTS_CREATOR, getCreator());
-
 			record.put(
 					DbHelper.EVENTS_STARTING_TS,
 					new Long(date2Timestamp(starting.getYear(),
 							starting.getMonth(), starting.getDate(),
 							starting.getHours(), starting.getMinutes()))
 							.toString());
-
 			record.put(
 					DbHelper.EVENTS_ENDING_TS,
 					new Long(date2Timestamp(ending.getYear(),
@@ -281,14 +286,8 @@ public class NewEventActivity extends Activity implements OnClickListener {
 							ending.getHours(), ending.getMinutes())).toString());
 
 			boolean cnt = true;
-
 			try {
-				db.insertOrThrow(DbHelper.TABLE_EVENTS, null, record); // insert
-																		// the
-																		// record
-																		// into
-																		// the
-																		// database
+				db.insertOrThrow(DbHelper.TABLE_EVENTS, null, record);
 				Log.v(TAG, "Record inserted");
 
 			} catch (SQLException e) {
@@ -296,9 +295,12 @@ public class NewEventActivity extends Activity implements OnClickListener {
 				cnt = false;
 			}
 
+			// check if the record has been inserted
 			if (cnt) {
 				record.clear();
 
+				// query the database for the new record inserted (specially in
+				// order to know the id)
 				String[] entry = new String[7];
 				String query = "SELECT * FROM " + DbHelper.TABLE_EVENTS
 						+ " WHERE " + DbHelper.EVENTS_ID + " IN (SELECT MAX("
@@ -306,6 +308,8 @@ public class NewEventActivity extends Activity implements OnClickListener {
 						+ DbHelper.TABLE_EVENTS + ")";
 				Cursor cursor = db.rawQuery(query, null);
 
+				// create a string array with all the fields and save it into
+				// the spreadsheet
 				if (cursor.moveToFirst()) {
 					entry[0] = new Integer(cursor.getInt(0)).toString();
 					entry[1] = cursor.getString(1);
@@ -314,11 +318,13 @@ public class NewEventActivity extends Activity implements OnClickListener {
 					entry[4] = cursor.getString(4);
 					entry[5] = cursor.getString(5);
 					entry[6] = new Long(cursor.getLong(6)).toString();
-
 					new UpdateSpreadsheet().execute(entry);
 				}
-
-			}
+				
+				//set the result for create the toast when the activity finish
+				setResult(0);
+			} else
+				setResult(1);
 
 			db.close();
 			finish();
@@ -331,11 +337,14 @@ public class NewEventActivity extends Activity implements OnClickListener {
 		}
 	}
 
+	/**
+	 * This class create an async task in order to update the spreadsheet online
+	 *
+	 */
 	class UpdateSpreadsheet extends AsyncTask<String, String, String> {
 
 		@Override
 		protected String doInBackground(String... params) {
-
 			String spreadsheetTitle = app.getPrefs().getString(
 					(String) getText(R.string.credentialsKeySpreadsheetTitle),
 					"event_manager");
@@ -353,12 +362,5 @@ public class NewEventActivity extends Activity implements OnClickListener {
 			ws.addRecord(spreadsheets.get(0).getKey(), entry);
 			return params[0];
 		}
-
-		@Override
-		protected void onPostExecute(String result) {
-			Toast.makeText(NewEventActivity.this, "spreadsheet updated",
-					Toast.LENGTH_LONG).show();
-		}
-
 	}
 }
