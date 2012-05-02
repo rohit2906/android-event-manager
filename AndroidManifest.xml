@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="code.eventmanager"
     android:versionCode="1"
@@ -9,48 +10,39 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.USE_CREDENTIALS" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="code.eventmanager.SEND_EVENTS_NOTIFICATIONS" />
+    <uses-permission android:name="code.eventmanager.RECEIVE_EVENTS_NOTIFICATIONS" />
+    
+    <permission android:name="code.eventmanager.SEND_EVENTS_NOTIFICATIONS"
+    android:label="@string/permissionSendEventsNotificationsLabel"
+    android:description="@string/permissionSendEventsNotificationsDescription"
+    android:permissionGroup="android.permission-group.PERSONAL_INFO"
+    android:protectionLevel="normal" />
 
-    <application
-        android:name=".EventManagerApp"
-        android:icon="@drawable/ic_launcher"
+    <permission android:name="code.eventmanager.RECEIVE_EVENTS_NOTIFICATIONS"
+    android:label="@string/permissionReceiveEventsNotificationsLabel"
+    android:description="@string/permissionReceiveEventsNotificationsDescription"
+    android:permissionGroup="android.permission-group.PERSONAL_INFO"
+    android:protectionLevel="normal" />
+
+    <application android:name=".EventManagerApp" android:icon="@drawable/ic_launcher"
         android:label="@string/eventManagerTitle" >
-        <activity
-            android:name=".LoginActivity"
-            android:label="@string/loginTitle"
-            android:noHistory="true" >
-        </activity>
-        <activity
-            android:name=".CredentialsActivity"
-            android:label="@string/credentialsTitle"
-            android:noHistory="true" >
-        </activity>
-        <activity
-            android:name=".PreferencesActivity"
-            android:label="@string/preferencesTitle" >
-        </activity>
-        <activity
-            android:name=".EventsActivity"
-            android:label="@string/eventsTitle" >
-        </activity>
-        <activity
-            android:name=".NewEventActivity"
-            android:label="@string/neweventTitle" >
-        </activity>
-
-        <service
-            android:name=".PollerService"
-            android:label="@string/pollerTitle" >
-        </service>
-
-        <activity
-            android:name=".FirstActivity"
-            android:theme="@android:style/Theme.NoDisplay" >
+        
+        <activity android:name=".StartingActivity" android:theme="@android:style/Theme.NoDisplay" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        
+        <activity android:name=".LoginActivity" android:label="@string/loginTitle" android:noHistory="true" />
+        <activity android:name=".CredentialsActivity" android:label="@string/credentialsTitle" android:noHistory="true" />
+        <activity android:name=".PreferencesActivity" android:label="@string/preferencesTitle" />
+        <activity android:name=".EventsActivity" android:label="@string/eventsTitle" />
+        <activity android:name=".NewEventActivity" android:label="@string/neweventTitle" />
+
+        <service android:name=".PollerService" android:label="@string/pollerTitle" />
+        
     </application>
 
 </manifest>

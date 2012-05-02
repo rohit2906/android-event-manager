@@ -4,38 +4,45 @@
     <CheckBoxPreference
         android:disableDependentsState="true"
         android:enabled="true"
-        android:key="@string/credentialsKeyDefaultAccount"
+        android:key="@string/preferencesKeyDefaultAccount"
         android:summary="@string/preferencesUseDefaultAccountSummary"
         android:title="@string/preferencesUseDefaultAccountText" />
 
     <EditTextPreference
-        android:dependency="@string/credentialsKeyDefaultAccount"
-        android:key="@string/credentialsKeyCustomAccountMail"
+        android:dependency="@string/preferencesKeyDefaultAccount"
+        android:key="@string/preferencesKeyCustomAccountMail"
         android:summary="@string/preferencesOtherAccountEmailSummary"
         android:title="@string/preferencesOtherAccountEmailText" >
     </EditTextPreference>
     
     <EditTextPreference
-        android:dependency="@string/credentialsKeyDefaultAccount"
-        android:key="@string/credentialsKeyCustomAccountPassword"
+        android:dependency="@string/preferencesKeyDefaultAccount"
         android:password="true"
+        android:key="@string/preferencesKeyCustomAccountPassword"
         android:summary="@string/preferencesOtherAccountPasswordSummary"
         android:title="@string/preferencesOtherAccountPasswordText" >
     </EditTextPreference>
 
     <ListPreference
         android:defaultValue="1"
-        android:entries="@array/minutesBetweenUpdatesString"
-        android:entryValues="@array/minutesBetweenUpdatesValues"
-        android:key="@string/credentialsKeyMinutesBetweenUpdates"
+        android:entries="@array/minutesBetweenUpdatesStringsArray"
+        android:entryValues="@array/minutesBetweenUpdatesValuesArray"
+        android:key="@string/preferencesKeyMinutesBetweenUpdates"
         android:summary="@string/preferencesMinutesBetweenUpdatesSummary"
         android:title="@string/preferencesMinutesBetweenUpdatesText" />
 
     <EditTextPreference
         android:defaultValue="event_manager"
-        android:key="@string/credentialsKeySpreadsheetTitle"
+        android:key="@string/preferencesKeySpreadsheetTitle"
         android:summary="@string/preferencesSpreadsheetTitleText"
         android:title="@string/preferencesSpreadsheetTitleSummary" >
     </EditTextPreference>
+    
+    <CheckBoxPreference
+        android:enabled="true"
+        android:defaultValue="true"
+        android:key="@string/preferencesKeyStartOnBoot"
+        android:summary="@string/preferencesStartOnBootSummary"
+        android:title="@string/preferencesStartOnBootText" />
 
 </PreferenceScreen>

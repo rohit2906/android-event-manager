@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string-array name="minutesBetweenUpdatesString">
+    <string-array name="minutesBetweenUpdatesStringsArray">
         <item>No auto-updates</item>
         <item>1  minute</item>
         <item>15 minutes</item>
@@ -17,7 +17,7 @@
         <item>1  year</item>
     </string-array>
 
-    <string-array name="minutesBetweenUpdatesValues">
+    <string-array name="minutesBetweenUpdatesValuesArray">
         <item>0</item>
         <item>1</item>
         <item>15</item>
