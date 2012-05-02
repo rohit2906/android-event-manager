@@ -1,17 +1,12 @@
 package code.eventmanager;
 
-import java.util.ArrayList;
 import android.app.Activity;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
-
-import com.pras.SpreadSheet;
-import com.pras.WorkSheet;
 
 public class DetailsEventActivity extends Activity implements OnClickListener {
 
