@@ -10,6 +10,7 @@ import com.pras.WorkSheet;
 import com.pras.WorkSheetCell;
 import com.pras.WorkSheetRow;
 
+import android.accounts.AccountManager;
 import android.app.AlarmManager;
 import android.app.Application;
 import android.app.PendingIntent;
@@ -348,6 +349,7 @@ OnSharedPreferenceChangeListener {
 		return max;
 	}
 	
+	
 	/**
 	 * Convert a date into a timestamp
 	 * 
@@ -376,4 +378,33 @@ OnSharedPreferenceChangeListener {
 				getApplicationContext(), timestamp);
 		return realTime;
 	}
+
+
+
+	/**
+	 * Check which account is in use and return the email of the user.
+	 * 
+	 * @return the email of the user, that is the creator of the event
+	 */
+	public String getCreator() {
+		String creator;
+		boolean checked = this.getPrefs()
+				.getBoolean(
+						getText(R.string.preferencesKeyDefaultAccount)
+								.toString(), true);
+
+		if (checked) {
+			AccountManager manager = AccountManager
+					.get(getApplicationContext());
+			creator = manager.getAccountsByType("com.google")[0].name;
+		} 
+		else {
+			creator = this.getPrefs().getString(
+					getText(R.string.preferencesKeyCustomAccountMail)
+							.toString(), "");
+		}
+
+		return creator;
+	}
+
 }

@@ -14,6 +14,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
@@ -24,11 +26,21 @@ import android.widget.SimpleCursorAdapter.ViewBinder;
 /**
  * Manage the events displaying
  */
-public class EventsActivity extends Activity implements OnClickListener {
+public class EventsActivity extends Activity implements OnClickListener, OnItemClickListener {
 
 	private static final String TAG = EventsActivity.class.getSimpleName();
 	static final String SEND_EVENTS_NOTIFICATIONS = "code.eventmanager.SEND_EVENTS_NOTIFICATIONS";
 	private static final int NEW_EVENT_ACTIVITY_CODE = 0;
+	
+	public static final String EVENT_DETAILS_ID = "EVENT_DETAILS_ID";
+	public static final String EVENT_DETAILS_NAME = "EVENT_DETAILS_NAME";
+	public static final String EVENT_DETAILS_ADDRESS = "EVENT_DETAILS_ADDRESS";
+	public static final String EVENT_DETAILS_DESCRIPTION = "EVENT_DETAILS_DESCRIPTION";
+	public static final String EVENT_DETAILS_CREATOR = "EVENT_DETAILS_CREATOR";
+	public static final String EVENT_DETAILS_STARTING = "EVENT_DETAILS_STARTING";
+	public static final String EVENT_DETAILS_ENDING = "EVENT_DETAILS_ENDING";
+
+
 
 	Button buttonNewEvent;
 	Intent pollerServiceIntent;
@@ -55,6 +67,7 @@ public class EventsActivity extends Activity implements OnClickListener {
 		app = (EventManagerApp) getApplication();
 
 		eventList = (ListView) findViewById(R.id.eventsList);
+		eventList.setOnItemClickListener(this);
 		buttonNewEvent = (Button) findViewById(R.id.eventsButtonNewEvent);
 		buttonNewEvent.setOnClickListener(this);
 
@@ -183,5 +196,21 @@ public class EventsActivity extends Activity implements OnClickListener {
 				setupList();
 			}
 		}
+	}
+
+	@Override
+	public void onItemClick(AdapterView<?> a, View v, int position, long id) {
+		
+		Cursor cursor = ((SimpleCursorAdapter) a.getAdapter()).getCursor();
+		cursor.moveToPosition(position);
+		Intent intent = new Intent(this, DetailsEventActivity.class);
+		intent.putExtra(EVENT_DETAILS_ID, id);
+		intent.putExtra(EVENT_DETAILS_NAME, cursor.getString(1));
+		intent.putExtra(EVENT_DETAILS_ADDRESS, cursor.getString(2));
+		intent.putExtra(EVENT_DETAILS_DESCRIPTION, cursor.getString(3));
+		intent.putExtra(EVENT_DETAILS_CREATOR, cursor.getString(4));
+		intent.putExtra(EVENT_DETAILS_STARTING, app.timestamp2Date(cursor.getLong(5)));
+		intent.putExtra(EVENT_DETAILS_ENDING, app.timestamp2Date(cursor.getLong(6)));
+		startActivity(intent);
 	}
 }
