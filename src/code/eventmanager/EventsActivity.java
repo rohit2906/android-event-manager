@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.text.format.DateUtils;
 import android.util.Log;
@@ -28,60 +27,50 @@ import android.widget.SimpleCursorAdapter.ViewBinder;
 public class EventsActivity extends Activity implements OnClickListener {
 
 	private static final String TAG = EventsActivity.class.getSimpleName();
+	static final String SEND_EVENTS_NOTIFICATIONS = "code.eventmanager.SEND_EVENTS_NOTIFICATIONS";
 	private static final int NEW_EVENT_ACTIVITY_CODE = 0;
 
 	Button buttonNewEvent;
 	Intent pollerServiceIntent;
 	EventManagerApp app;
 	ListView eventList;
-
-	// SQLiteDatabase db;
-
 	IntentFilter filter;
 	EventsReceiver receiver;
 
 	Cursor cursor;
 	SimpleCursorAdapter adapter;
+	static final String[] FROM = { DbHelper.EVENT_NAME, DbHelper.EVENT_ADDRESS, DbHelper.EVENT_STARTING_TS };
+	static final int[] TO = { R.id.rowName, R.id.rowAddress, R.id.rowStartingTime };
 
 	/**
 	 * Reference to widgets and registration to onClick listener. Set the alarm
 	 * for the service. Set the filter for receiving the notification from the
-	 * service. Open the db.
+	 * service.
 	 */
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
 		setContentView(R.layout.events_layout);
-
 		Log.i(TAG, "onCreate");
-
 		app = (EventManagerApp) getApplication();
-		// pollerServiceIntent = null;
-		// startPoller();
 
 		eventList = (ListView) findViewById(R.id.eventsList);
 		buttonNewEvent = (Button) findViewById(R.id.eventsButtonNewEvent);
 		buttonNewEvent.setOnClickListener(this);
 
 		// set the alarm for the PollerService
-		app.setAlarm4Poller();
+		app.setAlarmForPollerFromPreferences();
 
 		Log.d(TAG, "Set the receiver and the filter");
 		receiver = new EventsReceiver();
 		filter = new IntentFilter(PollerService.NEW_EVENTS_INTENT);
-
-		// // Open the db in readable mode
-		// Log.d(TAG, "Open the database");
-		// db = app.getDbHelper().getReadableDatabase();
 	}
 
 	@Override
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.eventsButtonNewEvent:
-			startActivityForResult(new Intent(this, NewEventActivity.class),
-					NEW_EVENT_ACTIVITY_CODE);
+			startActivityForResult(new Intent(this, NewEventActivity.class), NEW_EVENT_ACTIVITY_CODE);
 			break;
 		}
 	}
@@ -89,7 +78,7 @@ public class EventsActivity extends Activity implements OnClickListener {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == NEW_EVENT_ACTIVITY_CODE) {
-			if(resultCode==0)
+			if (resultCode == 0)
 				Toast.makeText(this, "Event created", Toast.LENGTH_LONG).show();
 			else
 				Toast.makeText(this, "Problems with the creation of the event. Try again.", Toast.LENGTH_LONG).show();
@@ -109,9 +98,11 @@ public class EventsActivity extends Activity implements OnClickListener {
 		case R.id.menuItemPreferences:
 			startActivity(new Intent(this, PreferencesActivity.class));
 			break;
+
 		case R.id.menuItemSyncNow:
 			startService(new Intent(this, PollerService.class));
 			break;
+
 		case R.id.menuItemNewEvent:
 			startActivityForResult(new Intent(this, NewEventActivity.class),
 					NEW_EVENT_ACTIVITY_CODE);
@@ -127,7 +118,8 @@ public class EventsActivity extends Activity implements OnClickListener {
 	protected void onResume() {
 		super.onResume();
 		Log.v(TAG, "onResume");
-		super.registerReceiver(receiver, filter);
+		this.setupList();
+		super.registerReceiver(receiver, filter, SEND_EVENTS_NOTIFICATIONS, null);
 	}
 
 	/**
@@ -140,33 +132,18 @@ public class EventsActivity extends Activity implements OnClickListener {
 		unregisterReceiver(receiver);
 	}
 
-	// /**
-	// * Close the database
-	// */
-	// @Override
-	// protected void onDestroy() {
-	// Log.v(TAG, "onDestroy");
-	// db.close();
-	// super.onDestroy();
-	// }
-
 	/**
 	 * Responsible for fetching data and setting up the list and the adapter
 	 */
 	private void setupList() {
 		// Get the data
-		SQLiteDatabase db = app.getDbHelper().getReadableDatabase();
-		try {
-			cursor = db.query(DbHelper.TABLE_EVENTS, null, null, null, null,
-					null, DbHelper.EVENTS_STARTING_TS);
-			startManagingCursor(cursor);
-
-			// Setup Adapter
-			adapter.setViewBinder(VIEW_BINDER);
-			eventList.setAdapter(adapter);
-		} finally {
-			db.close();
-		}
+	    cursor = app.getAllEvents();
+	    startManagingCursor(cursor);
+	    
+	    // Setup Adapter
+	    adapter = new SimpleCursorAdapter(this, R.layout.row, cursor, FROM, TO);
+	    adapter.setViewBinder(VIEW_BINDER);
+	    eventList.setAdapter(adapter);
 	}
 
 	/**
@@ -177,10 +154,8 @@ public class EventsActivity extends Activity implements OnClickListener {
 
 		@Override
 		public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
-
-			// check if the view to bind is one of the time textview widgets
-			if (view.getId() != R.id.eventRowTvStarting
-					&& view.getId() != R.id.eventRowTvEnding)
+			//check if the view to bind is one of the time textview widgets
+			if ((view.getId() != R.id.rowStartingTime))
 				return false;
 
 			// convert the timestamp into a real time way
@@ -193,22 +168,20 @@ public class EventsActivity extends Activity implements OnClickListener {
 		}
 	};
 
-	/*
-	 * private void startPoller() { if (pollerServiceIntent == null) {
-	 * pollerServiceIntent = new Intent(this, PollerServiceOld.class);
-	 * startService(pollerServiceIntent); } else { Log.d(TAG,
-	 * "startPoller(): PollerService is already running."); } }
-	 * 
-	 * private void stopPoller() { if (pollerServiceIntent != null) {
-	 * stopService(pollerServiceIntent); pollerServiceIntent = null; } else {
-	 * Log.d(TAG, "stopPoller(): PollerService is not running."); } }
-	 */
-
 	class EventsReceiver extends BroadcastReceiver {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			Log.d(EventsReceiver.class.getSimpleName(), "onReceived");
-			setupList();
+			Log.d(TAG, "onReceived");
+			int receivedEvents = intent.getIntExtra(PollerService.NEW_EVENTS_EXTRA_COUNT, 0);
+
+			if (receivedEvents < 0) {
+				// Impossible to get the spreadsheet. Show a toast
+				Toast.makeText(EventsActivity.this, "Impossible to get the spreadsheet. Have you set the account?", Toast.LENGTH_LONG).show();
+				Log.w(TAG, "Broadcast with -1 count. Impossible to get spreadsheets");
+			} else if (receivedEvents > 0) {
+				Log.v(TAG, receivedEvents + " events received");
+				setupList();
+			}
 		}
 	}
 }

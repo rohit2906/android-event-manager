@@ -11,7 +11,6 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.ContentValues;
-import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
@@ -133,13 +132,16 @@ public class NewEventActivity extends Activity implements OnClickListener {
 			return new DatePickerDialog(this, startingDateSetListener,
 					starting.getYear() + 1900, starting.getMonth(),
 					starting.getDate());
+			
 		case STARTING_TIME_DIALOG_ID:
 			return new TimePickerDialog(this, startingTimeSetListener,
 					starting.getHours(), starting.getMinutes(), true);
+			
 		case ENDING_DATE_DIALOG_ID:
 			return new DatePickerDialog(this, endingDateSetListener,
 					ending.getYear() + 1900, ending.getMonth(),
 					ending.getDate());
+			
 		case ENDING_TIME_DIALOG_ID:
 			return new TimePickerDialog(this, endingTimeSetListener,
 					starting.getHours(), starting.getMinutes(), true);
@@ -149,8 +151,7 @@ public class NewEventActivity extends Activity implements OnClickListener {
 
 	// Listener of the starting date dialog for setting the starting date
 	private DatePickerDialog.OnDateSetListener startingDateSetListener = new DatePickerDialog.OnDateSetListener() {
-		public void onDateSet(DatePicker view, int year, int monthOfYear,
-				int dayOfMonth) {
+		public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
 			Log.v(TAG, "Setting starting date");
 			starting.setYear(year - 1900);
 			starting.setMonth(monthOfYear);
@@ -203,10 +204,10 @@ public class NewEventActivity extends Activity implements OnClickListener {
 	 * @param day
 	 * @param hour
 	 * @param minute
+	 * 
 	 * @return milliseconds
 	 */
-	private long date2Timestamp(int year, int month, int day, int hour,
-			int minute) {
+	private long date2Timestamp(int year, int month, int day, int hour, int minute) {
 		Calendar c = Calendar.getInstance();
 		c.set(Calendar.YEAR, year);
 		c.set(Calendar.MONTH, month);
@@ -225,19 +226,15 @@ public class NewEventActivity extends Activity implements OnClickListener {
 	 */
 	private String getCreator() {
 		String creator;
-		boolean checked = app.getPrefs()
-				.getBoolean(
-						getText(R.string.credentialsKeyDefaultAccount)
-								.toString(), true);
+		boolean checked = app.getPrefs().getBoolean(
+						getText(R.string.preferencesKeyDefaultAccount).toString(), true);
 
 		if (checked) {
-			AccountManager manager = AccountManager
-					.get(getApplicationContext());
+			AccountManager manager = AccountManager	.get(getApplicationContext());
 			creator = manager.getAccountsByType("com.google")[0].name;
 		} else {
 			creator = app.getPrefs().getString(
-					getText(R.string.credentialsKeyCustomAccountMail)
-							.toString(), "");
+					getText(R.string.preferencesKeyCustomAccountMail).toString(), "");
 		}
 
 		return creator;
@@ -253,85 +250,92 @@ public class NewEventActivity extends Activity implements OnClickListener {
 		case R.id.neweventButtonStartingDate:
 			showDialog(STARTING_DATE_DIALOG_ID);
 			break;
+			
 		case R.id.neweventButtonStartingTime:
 			showDialog(STARTING_TIME_DIALOG_ID);
 			break;
+			
 		case R.id.neweventButtonEndingDate:
 			showDialog(ENDING_DATE_DIALOG_ID);
 			break;
+			
 		case R.id.neweventButtonEndingTime:
 			showDialog(ENDING_TIME_DIALOG_ID);
 			break;
+			
 		case R.id.neweventButtonCreate:
-
+			// open the database
 			SQLiteDatabase db = app.getDbHelper().getWritableDatabase();
 			ContentValues record = new ContentValues();
+			
+			String dataName = etTitle.getText().toString();
+			String dataAddress = etAddress.getText().toString();
+			String dataDescription = etDescription.getText().toString();
+			String dataCreator = getCreator();
+			long dataStartingTS = date2Timestamp(starting.getYear(), starting.getMonth(), starting.getDate(), starting.getHours(), starting.getMinutes());
+			long dataEndingTS = date2Timestamp(ending.getYear(), ending.getMonth(), ending.getDate(), ending.getHours(), ending.getMinutes());
 
-			// save into the database
-			record.put(DbHelper.EVENTS_NAME, etTitle.getText().toString());
-			record.put(DbHelper.EVENTS_ADDRESS, etAddress.getText().toString());
-			record.put(DbHelper.EVENTS_DESCRIPTION, etDescription.getText()
-					.toString());
-			record.put(DbHelper.EVENTS_CREATOR, getCreator());
-			record.put(
-					DbHelper.EVENTS_STARTING_TS,
-					new Long(date2Timestamp(starting.getYear(),
-							starting.getMonth(), starting.getDate(),
-							starting.getHours(), starting.getMinutes()))
-							.toString());
-			record.put(
-					DbHelper.EVENTS_ENDING_TS,
-					new Long(date2Timestamp(ending.getYear(),
-							ending.getMonth(), ending.getDate(),
-							ending.getHours(), ending.getMinutes())).toString());
-
-			boolean cnt = true;
+			record.put(DbHelper.EVENT_NAME, dataName);
+			record.put(DbHelper.EVENT_ADDRESS, dataAddress);
+			record.put(DbHelper.EVENT_DESCRIPTION, dataDescription);
+			record.put(DbHelper.EVENT_CREATOR, dataCreator);
+			record.put(DbHelper.EVENT_STARTING_TS, dataStartingTS);
+			record.put(DbHelper.EVENT_ENDING_TS, dataEndingTS);
+			boolean recordInserted = true;
 			try {
-				db.insertOrThrow(DbHelper.TABLE_EVENTS, null, record);
+				// insert the record into the database
+				db.insertOrThrow(DbHelper.TABLE_EVENTS, null, record); 
 				Log.v(TAG, "Record inserted");
 
 			} catch (SQLException e) {
 				Log.w(TAG, "Record not inserted");
-				cnt = false;
+				recordInserted = false;
 			}
 
-			// check if the record has been inserted
-			if (cnt) {
+			if (recordInserted) {
 				record.clear();
-
-				// query the database for the new record inserted (specially in
-				// order to know the id)
-				String[] entry = new String[7];
-				String query = "SELECT * FROM " + DbHelper.TABLE_EVENTS
-						+ " WHERE " + DbHelper.EVENTS_ID + " IN (SELECT MAX("
-						+ DbHelper.EVENTS_ID + ") FROM "
-						+ DbHelper.TABLE_EVENTS + ")";
-				Cursor cursor = db.rawQuery(query, null);
-
-				// create a string array with all the fields and save it into
-				// the spreadsheet
-				if (cursor.moveToFirst()) {
-					entry[0] = new Integer(cursor.getInt(0)).toString();
-					entry[1] = cursor.getString(1);
-					entry[2] = cursor.getString(2);
-					entry[3] = cursor.getString(3);
-					entry[4] = cursor.getString(4);
-					entry[5] = cursor.getString(5);
-					entry[6] = new Long(cursor.getLong(6)).toString();
+				int max = app.getMaxEventId(db);
+				if (max != -1) {
+					String[] entry = new String[7];
+					
+					entry[0] = Integer.toString(max);
+					entry[1] = dataName;
+					entry[2] = dataAddress;
+					entry[3] = dataDescription;
+					entry[4] = dataCreator;
+					entry[5] = Long.toString(dataStartingTS);
+					entry[6] = Long.toString(dataEndingTS);
 					new UpdateSpreadsheet().execute(entry);
+					
+					//set the result for create the toast when the activity finish
+					setResult(0);
+				} else {
+					recordInserted = false;
+					
+					//set the result for create the toast when the activity finish
+					setResult(1);
 				}
-				
-				//set the result for create the toast when the activity finish
-				setResult(0);
-			} else
-				setResult(1);
+			}
 
+			// Close the database
 			db.close();
-			finish();
+			
+			if (recordInserted) {
+				// Close the activity
+				finish();
+			} else {
+				// Problem saving record
+				Log.w(TAG, "Problem saving record.");
+				Toast.makeText(NewEventActivity.this, "Problem creating the event. Retry", Toast.LENGTH_LONG);
+			}
+			
 			break;
+			
 		case R.id.neweventButtonCancel:
+			// Close the activity
 			finish();
 			break;
+			
 		default:
 			break;
 		}
@@ -346,19 +350,21 @@ public class NewEventActivity extends Activity implements OnClickListener {
 		@Override
 		protected String doInBackground(String... params) {
 			String spreadsheetTitle = app.getPrefs().getString(
-					(String) getText(R.string.credentialsKeySpreadsheetTitle),
-					"event_manager");
+					(String) getText(R.string.preferencesKeySpreadsheetTitle), "event_manager");
 			ArrayList<SpreadSheet> spreadsheets = app.getSpreadsheetFactory()
 					.getSpreadSheet(spreadsheetTitle, false);
+			
 			WorkSheet ws = spreadsheets.get(0).getAllWorkSheets().get(0);
 			HashMap<String, String> entry = new HashMap<String, String>();
-			entry.put(DbHelper.EVENTS_ID, params[0]);
-			entry.put(DbHelper.EVENTS_NAME, params[1]);
-			entry.put(DbHelper.EVENTS_ADDRESS, params[2]);
-			entry.put(DbHelper.EVENTS_DESCRIPTION, params[3]);
-			entry.put(DbHelper.EVENTS_CREATOR, params[4]);
-			entry.put(DbHelper.EVENTS_STARTING_TS, params[5]);
-			entry.put(DbHelper.EVENTS_ENDING_TS, params[6]);
+			
+			entry.put(DbHelper.EVENT_ID, params[0]);
+			entry.put(DbHelper.EVENT_NAME, params[1]);
+			entry.put(DbHelper.EVENT_ADDRESS, params[2]);
+			entry.put(DbHelper.EVENT_DESCRIPTION, params[3]);
+			entry.put(DbHelper.EVENT_CREATOR, params[4]);
+			entry.put(DbHelper.EVENT_STARTING_TS, params[5]);
+			entry.put(DbHelper.EVENT_ENDING_TS, params[6]);
+			
 			ws.addRecord(spreadsheets.get(0).getKey(), entry);
 			return params[0];
 		}

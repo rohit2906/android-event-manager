@@ -2,6 +2,7 @@ package code.eventmanager;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -45,30 +46,21 @@ public class CredentialsActivity extends Activity implements OnClickListener {
 		String username = etUsername.getText().toString();
 		String password = etPassword.getText().toString();
 		if (username.isEmpty()) {
-			Toast.makeText(this, "Write your username", Toast.LENGTH_LONG)
-					.show();
+			Toast.makeText(this, "Write your username", Toast.LENGTH_LONG).show();
 		} else if (password.isEmpty()) {
-			Toast.makeText(this, "Write your password", Toast.LENGTH_LONG)
-					.show();
+			Toast.makeText(this, "Write your password", Toast.LENGTH_LONG).show();
 		} else {
-			app.getPrefs()
-					.edit()
-					.putBoolean(
-							(String) getText(R.string.credentialsKeyDefaultAccount),
-							false);
-			app.getPrefs()
-					.edit()
-					.putString(
-							(String) getText(R.string.credentialsKeyCustomAccountMail),
-							username);
-			app.getPrefs()
-					.edit()
-					.putString(
-							(String) getText(R.string.credentialsKeyCustomAccountPassword),
-							password);
-			app.getPrefs().edit().apply();
+			Editor editor = app.getPrefs().edit();
+			
+			editor.putBoolean((String) getText(R.string.preferencesKeyDefaultAccount), false);
+			editor.putString((String) getText(R.string.preferencesKeyCustomAccountMail), username);
+			editor.putString((String) getText(R.string.preferencesKeyCustomAccountPassword), password);
+			editor.commit();
 
 			startActivity(new Intent(this, EventsActivity.class));
+			
+			// close the activity
+			finish();
 		}
 	}
 

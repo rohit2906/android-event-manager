@@ -9,45 +9,62 @@
     <string name="loginTvLoginText">Login</string>
     
     <string name="credentialsTitle">Credentials</string>
-    <string name="credentialsTvUsernameText">Username</string>
+    <string name="credentialsTvUsernameText">Google e-mail</string>
     <string name="credentialsTvPasswordText">Password</string>
     <string name="credentialsBtnLoginText">Login</string>
-    <string name="credentialsKeyDefaultAccount">useDefaultAccount</string>
-    <string name="credentialsKeySpreadsheetTitle">spreadsheetTitle</string>
-    <string name="credentialsKeyMinutesBetweenUpdates">minutesBetweenUpdates</string>
-    <string name="credentialsKeyCustomAccountPassword">customAccountPassword</string>
-    <string name="credentialsKeyCustomAccountMail">customAccountEmail</string>
+    
+    <string name="neweventTitle">New Event</string>
     <string name="neweventTextViewNewEventText">New Event</string>
     <string name="neweventTextViewTitleText">Title</string>
     <string name="neweventTextViewStartingText">Starting</string>
     <string name="neweventTextViewEndingText">Ending</string>
     <string name="neweventButtonCreateText">Create</string>
+    <string name="menuItemNewEventText">New Event</string>
+    <string name="neweventButtonCancelText">Cancel</string>
+    <string name="neweventTextViewDescriptionText">Description</string>
+    <string name="neweventTextViewAddressText">Address</string>
     
-    <string name="eventsTitle">Upcoming Events</string>
-    <string name="eventsTitleText">Upcoming Events</string>
+    <string name="eventsTitle">Events</string>
+    <string name="eventsTitleText">Events</string>
     <string name="eventsButtonNewEventText">New Event</string>
     
     <string name="menuItemPreferencesText">Preferences</string>
     <string name="menuItemSyncNowText">Sync Now</string>
     
     <string name="preferencesTitle">Preferences</string>
+    <string name="preferencesKeyMinutesBetweenUpdates">minutesBetweenUpdates</string>
+    <string name="preferencesKeyDefaultAccount">useDefaultAccount</string>
     <string name="preferencesUseDefaultAccountText">Default Google Account</string>
     <string name="preferencesUseDefaultAccountSummary">Use your mobile\'s Google Account</string>
+    <string name="preferencesKeyCustomAccountMail">customAccountEmail</string>
     <string name="preferencesOtherAccountEmailText">E-mail</string>
     <string name="preferencesOtherAccountEmailSummary">Google Account\'s Email</string>
+    <string name="preferencesKeyCustomAccountPassword">customAccountPassword</string>
     <string name="preferencesOtherAccountPasswordText">Password</string>
     <string name="preferencesOtherAccountPasswordSummary">Google Account\'s Password</string>
     <string name="preferencesMinutesBetweenUpdatesText">Update Time</string>
     <string name="preferencesMinutesBetweenUpdatesSummary">Automatic updates frequency</string>
+    <string name="preferencesKeySpreadsheetTitle">spreadsheetTitle</string>
     <string name="preferencesSpreadsheetTitleText">Spreadsheet Title</string>
     <string name="preferencesSpreadsheetTitleSummary">Name of the spreadsheet to check</string>
+    <string name="preferencesKeyStartOnBoot">startOnBoot</string>
+    <string name="preferencesStartOnBootText">Start on Boot</string>
+    <string name="preferencesStartOnBootSummary">Start updater service after boot</string>
     
     <string name="pollerTitle">PollerService</string>
     
-    <string name="menuItemNewEventText">New Event</string>
-    <string name="neweventButtonCancelText">Cancel</string>
-    <string name="neweventTextViewDescriptionText">Description</string>
-    <string name="neweventTextViewAddressText">Address</string>
-    <string name="neweventTitle">New Event</string>
+    <string name="permissionSendEventsNotificationsLabel">Sends Events Notifications</string>
+    <string name="permissionSendEventsNotificationsDescription">Allow this application to send events
+    		notifications to other applications</string>
+  	<string name="permissionReceiveEventsNotificationsLabel">Receive Events Notifications</string>
+  	<string name="permissionReceiveEventsNotificationsDescription">Allow this application to receive events
+    		notifications from other applications</string>		
+  	
+    <string name="notificationTitle">Event Manager</string>
+    <string name="notificationMessage" formatted="false">You received %d new event invitation%s!</string>
+    
+    <string name="rowNameText">Event Name</string>
+    <string name="rowStartingTimeText">starting time</string>
+    <string name="rowAddressText">Address</string>
 
 </resources>

@@ -2,7 +2,7 @@ package code.eventmanager;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -32,7 +32,6 @@ public class LoginActivity extends Activity implements OnClickListener {
 		btnOtherAccount = (Button) findViewById(R.id.loginBtnOtherAccount);
 		btnLogin.setOnClickListener(this);
 		btnOtherAccount.setOnClickListener(this);
-
 	}
 
 	/**
@@ -46,17 +45,18 @@ public class LoginActivity extends Activity implements OnClickListener {
 		switch (v.getId()) {
 		case R.id.loginBtnLogin:
 			Log.d(TAG, "loginBtnLogin onClick()");
-			SharedPreferences.Editor editor = app.getPrefs().edit();
+			Editor editor = app.getPrefs().edit();
 			editor.putBoolean(
-					(String) getText(R.string.credentialsKeyDefaultAccount),
-					true);
+					(String) getText(R.string.preferencesKeyDefaultAccount), true);
 			editor.commit();
 			startActivity(new Intent(this, EventsActivity.class));
+			finish();
 			break;
 
 		case R.id.loginBtnOtherAccount:
 			Log.d(TAG, "loginBtnOtherAccount onClick()");
 			startActivity(new Intent(this, CredentialsActivity.class));
+			finish();
 			break;
 		}
 	}
