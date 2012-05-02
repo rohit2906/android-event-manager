@@ -196,26 +196,7 @@ public class NewEventActivity extends Activity implements OnClickListener {
 
 	
 
-	/**
-	 * Check which account is in use and return the email of the user.
-	 * 
-	 * @return the email of the user, that is the creator of the event
-	 */
-	private String getCreator() {
-		String creator;
-		boolean checked = app.getPrefs().getBoolean(
-						getText(R.string.preferencesKeyDefaultAccount).toString(), true);
 
-		if (checked) {
-			AccountManager manager = AccountManager	.get(getApplicationContext());
-			creator = manager.getAccountsByType("com.google")[0].name;
-		} else {
-			creator = app.getPrefs().getString(
-					getText(R.string.preferencesKeyCustomAccountMail).toString(), "");
-		}
-
-		return creator;
-	}
 
 	/**
 	 * Catch the click of the dates, times, create buttons
@@ -248,7 +229,7 @@ public class NewEventActivity extends Activity implements OnClickListener {
 			String dataName = etTitle.getText().toString();
 			String dataAddress = etAddress.getText().toString();
 			String dataDescription = etDescription.getText().toString();
-			String dataCreator = getCreator();
+			String dataCreator = app.getCreator();
 			long dataStartingTS = app.date2Timestamp(starting.getYear(), starting.getMonth(), starting.getDate(), starting.getHours(), starting.getMinutes());
 			long dataEndingTS = app.date2Timestamp(ending.getYear(), ending.getMonth(), ending.getDate(), ending.getHours(), ending.getMinutes());
 

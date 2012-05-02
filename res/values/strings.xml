@@ -66,5 +66,12 @@
     <string name="rowNameText">Event Name</string>
     <string name="rowStartingTimeText">starting time</string>
     <string name="rowAddressText">Address</string>
+    <string name="detailseventButtonReturnText">OK</string>
+    <string name="detailseventButtonDeleteText">Delete</string>
+    <string name="detailseventTextViewTitleText">Title</string>
+    <string name="detailseventTextViewStartingText">Starting</string>
+    <string name="detailseventTextViewEndingText">Ending</string>
+    <string name="detailseventTextViewAddressText">Adress</string>
+    <string name="detailseventTextViewDescriptionText">Description</string>
 
 </resources>
