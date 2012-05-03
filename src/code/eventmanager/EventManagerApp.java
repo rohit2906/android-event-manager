@@ -434,9 +434,9 @@ public class EventManagerApp extends Application implements
 			Integer[] arrayId = new Integer[1];
 			arrayId[0] = id;
 			new DeleteEventOnSpreadsheet().execute(arrayId);
+			return true;
 		}
 		
-		// TODO: what is this?
 		Log.w(TAG, "Problems deleting the event in the database");
 		return false;
 	}
