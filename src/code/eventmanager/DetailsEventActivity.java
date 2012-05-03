@@ -8,7 +8,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class DetailsEventActivity extends Activity implements OnClickListener {
 
@@ -77,9 +76,6 @@ public class DetailsEventActivity extends Activity implements OnClickListener {
 					Log.d(TAG, "event deleted");
 					setResult(CODE_EVENT_DELETED);
 					finish();
-				} else {
-					Toast.makeText(this, "You are not the creator of the event.", Toast.LENGTH_LONG).show();
-					Log.d(TAG, "Deletion not allowed. User != Creator.");
 				}
 			}
 			

@@ -25,6 +25,7 @@ import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.text.format.DateUtils;
 import android.util.Log;
+import android.widget.Toast;
 
 /**
  * 
@@ -392,26 +393,24 @@ public class EventManagerApp extends Application implements
 	/**
 	 * Check which account is in use and return the email of the user.
 	 * 
-	 * @return the email of the user, that is the creator of the event
+	 * @return the email of the user
 	 */
-	public String getCreator() {
-		String creator;
+	public String getUsername() {
+		String username;
 		boolean checked = this.getPrefs()
 				.getBoolean(
 						getText(R.string.preferencesKeyDefaultAccount)
 								.toString(), true);
-
 		if (checked) {
 			AccountManager manager = AccountManager
 					.get(getApplicationContext());
-			creator = manager.getAccountsByType("com.google")[0].name;
+			username = manager.getAccountsByType("com.google")[0].name;
 		} else {
-			creator = this.getPrefs().getString(
+			username = this.getPrefs().getString(
 					getText(R.string.preferencesKeyCustomAccountMail)
 							.toString(), "");
 		}
-
-		return creator;
+		return username;
 	}
 
 	/**
@@ -422,22 +421,46 @@ public class EventManagerApp extends Application implements
 	 * @return the outcome of the operation
 	 */
 	public boolean deleteEvent(int id) {
-		// delete the event from the database
 		SQLiteDatabase db = getDbHelper().getWritableDatabase();
-		int eventsDeleted = db.delete(DbHelper.TABLE_EVENTS, DbHelper.EVENT_ID
-				+ "=?", new String[] { Integer.toString(id) });
-		db.close();
+		String[] arrayId = new String[1];
+		arrayId[0] = Integer.toString(id);
+		String[] arrayCreator = new String[1];
+		arrayCreator[0] = DbHelper.EVENT_CREATOR;
+		Cursor cursor = db.rawQuery("SELECT " + DbHelper.EVENT_CREATOR
+				+ " FROM " + DbHelper.TABLE_EVENTS + " WHERE "
+				+ DbHelper.EVENT_ID + "=" + id, null);
+		cursor.moveToFirst();
+		String currentUser = getUsername();
+		String creator = cursor.getString(0);
+		if (currentUser.equalsIgnoreCase(creator)) {
+			// delete the event from the database
 
-		// delete the event from the spreadsheet
-		if (eventsDeleted > 0) {
-			Log.d(TAG, "Event deleted from the database");
-			Integer[] arrayId = new Integer[1];
-			arrayId[0] = id;
-			new DeleteEventOnSpreadsheet().execute(arrayId);
-			return true;
+			int eventsDeleted = db.delete(DbHelper.TABLE_EVENTS,
+					DbHelper.EVENT_ID + "=?",
+					new String[] { Integer.toString(id) });
+			db.close();
+
+			// delete the event from the spreadsheet
+			if (eventsDeleted > 0) {
+				Log.d(TAG, "Event deleted from the database");
+				new DeleteEventOnSpreadsheet().execute(arrayId);
+				Toast.makeText(this, "Event deleted.", Toast.LENGTH_LONG)
+						.show();
+				return true;
+			}
+
+			Log.w(TAG, "Problems deleting the event in the database");
+			Toast.makeText(this,
+					"Problems deleting the event in the database.",
+					Toast.LENGTH_LONG).show();
+			return false;
 		}
-		
-		Log.w(TAG, "Problems deleting the event in the database");
+		Toast.makeText(
+				this,
+				"You are not the creator of the event.", Toast.LENGTH_LONG).show();
+		Log.d(TAG,
+				"Deletion not allowed. " + currentUser + "!= "
+						+ creator);
 		return false;
 	}
 
@@ -480,17 +503,17 @@ public class EventManagerApp extends Application implements
 	 * spreadsheet online
 	 * 
 	 */
-	class DeleteEventOnSpreadsheet extends AsyncTask<Integer, Boolean, String> {
+	class DeleteEventOnSpreadsheet extends AsyncTask<String, Boolean, String> {
 
 		@Override
-		protected String doInBackground(Integer... params) {
+		protected String doInBackground(String... params) {
 			WorkSheet ws = getWorkSheet();
 			ArrayList<WorkSheetRow> rows = ws.getData(false);
 			WorkSheetRow wsr = null;
 			for (int i = 0; i < rows.size(); i++) {
 				ArrayList<WorkSheetCell> wsc = rows.get(i).getCells();
 				// Put in the database only the new events
-				if (wsc.get(0).getValue() == Integer.toString(params[0])) {
+				if (wsc.get(0).getValue().equalsIgnoreCase(params[0])) {
 					wsr = rows.get(i);
 					break;
 				}

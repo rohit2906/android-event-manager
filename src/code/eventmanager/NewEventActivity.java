@@ -228,7 +228,7 @@ public class NewEventActivity extends Activity implements OnClickListener {
 			String dataName = etTitle.getText().toString();
 			String dataAddress = etAddress.getText().toString();
 			String dataDescription = etDescription.getText().toString();
-			String dataCreator = app.getCreator();
+			String dataCreator = app.getUsername();
 			long dataStartingTS = app.date2Timestamp(starting.getYear(), starting.getMonth(), starting.getDate(), starting.getHours(), starting.getMinutes());
 			long dataEndingTS = app.date2Timestamp(ending.getYear(), ending.getMonth(), ending.getDate(), ending.getHours(), ending.getMinutes());
 
