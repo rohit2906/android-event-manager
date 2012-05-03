@@ -2,9 +2,6 @@ package code.eventmanager;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
-
-import code.eventmanager.NewEventActivity.UpdateSpreadsheet;
 import code.eventmanager.auth.AndroidAuthenticator;
 import com.pras.SpreadSheet;
 import com.pras.SpreadSheetFactory;
@@ -434,13 +431,14 @@ public class EventManagerApp extends Application implements
 		// delete the event from the spreadsheet
 		if (eventsDeleted > 0) {
 			Log.d(TAG, "Event deleted from the database");
-			Integer[] arrayId= new Integer[1];
-			arrayId[0]=id;
+			Integer[] arrayId = new Integer[1];
+			arrayId[0] = id;
 			new DeleteEventOnSpreadsheet().execute(arrayId);
 		}
+		
+		// TODO: what is this?
 		Log.w(TAG, "Problems deleting the event in the database");
 		return false;
-
 	}
 
 	/**

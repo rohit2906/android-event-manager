@@ -11,12 +11,7 @@
         android:layout_centerHorizontal="true"
         android:text="@string/eventsTitleText"
         android:textAppearance="?android:attr/textAppearanceLarge" />
-
-    <ListView
-        android:id="@+id/eventsList"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent" />
-
+    
     <Button
         android:id="@+id/eventsButtonNewEvent"
         android:layout_width="match_parent"
@@ -25,4 +20,11 @@
         android:layout_centerHorizontal="true"
         android:text="@string/eventsButtonNewEventText" />
 
+    <ListView
+        android:id="@+id/eventsList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/eventsTitle"
+        android:layout_above="@id/eventsButtonNewEvent" />
+    
 </RelativeLayout>
