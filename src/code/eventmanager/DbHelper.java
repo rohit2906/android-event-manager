@@ -12,9 +12,8 @@ public class DbHelper extends SQLiteOpenHelper {
 	private static final String TAG = DbHelper.class.getSimpleName();
 
 	public static final String DB_NAME = "EventManager.db";
-	public static int DB_VERSION = 2;
+	public static int DB_VERSION = 1;
 	public static final String TABLE_EVENTS = "events";
-	public static final String TABLE_ATTENDINGS = "attendings";
 	public static final String EVENT_ID = BaseColumns._ID;
 	public static final String EVENT_NAME = "name";
 	public static final String EVENT_ADDRESS = "address";
@@ -22,8 +21,6 @@ public class DbHelper extends SQLiteOpenHelper {
 	public static final String EVENT_CREATOR = "creator";
 	public static final String EVENT_STARTING_TS = "starting_timestamp";
 	public static final String EVENT_ENDING_TS = "ending_timestamp";
-	public static final String ATTENDINGS_EVENT_ID = "id_events";
-	public static final String ATTENDINGS_EMAILS = "emails";
 	public Context context;
 
 	public DbHelper(Context context) {
@@ -49,15 +46,6 @@ public class DbHelper extends SQLiteOpenHelper {
 
 		db.execSQL(sql);
 		Log.v(TAG, "SQL executed: " + sql);
-
-		sql = "CREATE TABLE " + TABLE_ATTENDINGS + " (" + ATTENDINGS_EVENT_ID
-				+ " integer NOT NULL REFERENCES " + TABLE_EVENTS + "("
-				+ EVENT_ID + ") ON DELETE CASCADE ON UPDATE CASCADE, "
-				+ ATTENDINGS_EMAILS + " text NOT NULL, PRIMARY KEY ("
-				+ ATTENDINGS_EVENT_ID + "," + ATTENDINGS_EMAILS + "))";
-
-		db.execSQL(sql);
-		Log.v(TAG, "SQL executed: " + sql);
 	}
 
 	/**
@@ -66,10 +54,7 @@ public class DbHelper extends SQLiteOpenHelper {
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		Log.i(TAG, "onUpgrade");
-
-		db.execSQL("drop table if exists " + TABLE_ATTENDINGS);
 		db.execSQL("drop table if exists " + TABLE_EVENTS);
-
 		onCreate(db);
 		DB_VERSION = newVersion;
 	}

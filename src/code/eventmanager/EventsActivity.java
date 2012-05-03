@@ -206,13 +206,12 @@ public class EventsActivity extends Activity implements OnClickListener, OnItemL
 	}
 
 	@Override
-	public boolean onItemLongClick(AdapterView<?> a, View v, int position, long id) {
+	public boolean onItemLongClick(AdapterView<?> a, View v, int position, final long rowId) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setMessage("Are you sure you want to delete it?").setCancelable(false)
 		.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {
-
-				if (app.deleteEvent(id))
+				if (app.deleteEvent((int)rowId))
 					eventDeletedAction();
 				else
 					eventNotDeletedAction();
