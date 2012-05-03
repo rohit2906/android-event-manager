@@ -40,6 +40,7 @@
         <activity android:name=".PreferencesActivity" android:label="@string/preferencesTitle" />
         <activity android:name=".EventsActivity" android:label="@string/eventsTitle" />
         <activity android:name=".NewEventActivity" android:label="@string/neweventTitle" />
+        <activity android:name=".DetailsEventActivity" android:label="@string/detailseventTitle" />
 
         <service android:name=".PollerService" android:label="@string/pollerTitle" />
         

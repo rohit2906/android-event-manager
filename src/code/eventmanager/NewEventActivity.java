@@ -265,12 +265,12 @@ public class NewEventActivity extends Activity implements OnClickListener {
 					new UpdateSpreadsheet().execute(entry);
 					
 					//set the result for create the toast when the activity finish
-					setResult(0);
+					setResult(RESULT_OK);
 				} else {
 					recordInserted = false;
 					
 					//set the result for create the toast when the activity finish
-					setResult(1);
+					setResult(RESULT_CANCELED);
 				}
 			}
 

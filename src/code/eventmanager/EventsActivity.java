@@ -34,7 +34,8 @@ public class EventsActivity extends Activity implements OnClickListener, OnItemL
 	private static final String TAG = EventsActivity.class.getSimpleName();
 	static final String SEND_EVENTS_NOTIFICATIONS = "code.eventmanager.SEND_EVENTS_NOTIFICATIONS";
 	private static final int NEW_EVENT_ACTIVITY_CODE = 0;
-	
+	private static final int DETAILS_ACTIVITY_DELETED_EVENT_CODE = 1;
+
 	public static final String EVENT_DETAILS_ID = "EVENT_DETAILS_ID";
 	public static final String EVENT_DETAILS_NAME = "EVENT_DETAILS_NAME";
 	public static final String EVENT_DETAILS_ADDRESS = "EVENT_DETAILS_ADDRESS";
@@ -43,12 +44,10 @@ public class EventsActivity extends Activity implements OnClickListener, OnItemL
 	public static final String EVENT_DETAILS_STARTING = "EVENT_DETAILS_STARTING";
 	public static final String EVENT_DETAILS_ENDING = "EVENT_DETAILS_ENDING";
 
-
-
 	Button buttonNewEvent;
 	Intent pollerServiceIntent;
 	EventManagerApp app;
-	ListView eventList;
+	ListView eventsList;
 	IntentFilter filter;
 	EventsReceiver receiver;
 
@@ -69,8 +68,10 @@ public class EventsActivity extends Activity implements OnClickListener, OnItemL
 		Log.i(TAG, "onCreate");
 		app = (EventManagerApp) getApplication();
 
-		eventList = (ListView) findViewById(R.id.eventsList);
-		eventList.setOnItemClickListener(this);
+		eventsList = (ListView) findViewById(R.id.eventsList);
+		eventsList.setOnItemClickListener(this);
+		eventsList.setOnItemLongClickListener(this);
+
 		buttonNewEvent = (Button) findViewById(R.id.eventsButtonNewEvent);
 		buttonNewEvent.setOnClickListener(this);
 
@@ -94,10 +95,15 @@ public class EventsActivity extends Activity implements OnClickListener, OnItemL
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == NEW_EVENT_ACTIVITY_CODE) {
-			if (resultCode == 0)
+			if (resultCode == RESULT_OK)
 				Toast.makeText(this, "Event created", Toast.LENGTH_LONG).show();
-			else
+			else if (resultCode == RESULT_CANCELED)
 				Toast.makeText(this, "Problems with the creation of the event. Try again.", Toast.LENGTH_LONG).show();
+		} else if (requestCode == DETAILS_ACTIVITY_DELETED_EVENT_CODE) {
+			if (resultCode == DetailsEventActivity.CODE_EVENT_DELETED) {
+				setupList();
+				Toast.makeText(this, "Event deleted", Toast.LENGTH_LONG).show();
+			}
 		}
 	}
 
@@ -153,13 +159,13 @@ public class EventsActivity extends Activity implements OnClickListener, OnItemL
 	 */
 	private void setupList() {
 		// Get the data
-	    cursor = app.getAllEvents();
-	    startManagingCursor(cursor);
-	    
-	    // Setup Adapter
-	    adapter = new SimpleCursorAdapter(this, R.layout.row, cursor, FROM, TO);
-	    adapter.setViewBinder(VIEW_BINDER);
-	    eventList.setAdapter(adapter);
+		cursor = app.getAllEvents();
+		startManagingCursor(cursor);
+
+		// Setup Adapter
+		adapter = new SimpleCursorAdapter(this, R.layout.row, cursor, FROM, TO);
+		adapter.setViewBinder(VIEW_BINDER);
+		eventsList.setAdapter(adapter);
 	}
 
 	/**
@@ -200,42 +206,41 @@ public class EventsActivity extends Activity implements OnClickListener, OnItemL
 			}
 		}
 	}
-	
-	
 
 	@Override
-	public boolean onItemLongClick(AdapterView<?> a, View v, int position,
-			long id) {
+	public boolean onItemLongClick(AdapterView<?> a, View v, int position, long id) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setMessage("Are you sure you want to delete it?")
-		       .setCancelable(false)
-		       .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-		           public void onClick(DialogInterface dialog, int id) {
-		                app.deleteEvent(id);
-		           }
-		       })
-		       .setNegativeButton("No", new DialogInterface.OnClickListener() {
-		           public void onClick(DialogInterface dialog, int id) {
-		                dialog.cancel();
-		           }
-		       });
-		AlertDialog alert = builder.create();
-		return false;
+		builder.setMessage("Are you sure you want to delete it?").setCancelable(false)
+		.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+
+				// TODO: check the creator
+				app.deleteEvent(id);
+				setupList();
+			}
+		})
+		.setNegativeButton("No", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+				dialog.cancel();
+			}
+		});
+		builder.show();
+		return true;
 	}
 
 	@Override
 	public void onItemClick(AdapterView<?> a, View v, int position, long id) {
-		
+
 		Cursor cursor = ((SimpleCursorAdapter) a.getAdapter()).getCursor();
 		cursor.moveToPosition(position);
 		Intent intent = new Intent(this, DetailsEventActivity.class);
-		intent.putExtra(EVENT_DETAILS_ID, id);
+		intent.putExtra(EVENT_DETAILS_ID, (int) id);
 		intent.putExtra(EVENT_DETAILS_NAME, cursor.getString(1));
 		intent.putExtra(EVENT_DETAILS_ADDRESS, cursor.getString(2));
 		intent.putExtra(EVENT_DETAILS_DESCRIPTION, cursor.getString(3));
 		intent.putExtra(EVENT_DETAILS_CREATOR, cursor.getString(4));
 		intent.putExtra(EVENT_DETAILS_STARTING, app.timestamp2Date(cursor.getLong(5)));
 		intent.putExtra(EVENT_DETAILS_ENDING, app.timestamp2Date(cursor.getLong(6)));
-		startActivity(intent);
+		startActivityForResult(intent, DETAILS_ACTIVITY_DELETED_EVENT_CODE);
 	}
 }
