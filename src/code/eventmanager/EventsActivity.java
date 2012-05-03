@@ -100,10 +100,8 @@ public class EventsActivity extends Activity implements OnClickListener, OnItemL
 			else if (resultCode == RESULT_CANCELED)
 				Toast.makeText(this, "Problems with the creation of the event. Try again.", Toast.LENGTH_LONG).show();
 		} else if (requestCode == DETAILS_ACTIVITY_DELETED_EVENT_CODE) {
-			if (resultCode == DetailsEventActivity.CODE_EVENT_DELETED) {
-				setupList();
-				Toast.makeText(this, "Event deleted", Toast.LENGTH_LONG).show();
-			}
+			if (resultCode == DetailsEventActivity.CODE_EVENT_DELETED)
+				eventDeletedAction();
 		}
 	}
 
@@ -214,9 +212,10 @@ public class EventsActivity extends Activity implements OnClickListener, OnItemL
 		.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {
 
-				// TODO: check the creator
-				app.deleteEvent(id);
-				setupList();
+				if (app.deleteEvent(id))
+					eventDeletedAction();
+				else
+					eventNotDeletedAction();
 			}
 		})
 		.setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -242,5 +241,14 @@ public class EventsActivity extends Activity implements OnClickListener, OnItemL
 		intent.putExtra(EVENT_DETAILS_STARTING, app.timestamp2Date(cursor.getLong(5)));
 		intent.putExtra(EVENT_DETAILS_ENDING, app.timestamp2Date(cursor.getLong(6)));
 		startActivityForResult(intent, DETAILS_ACTIVITY_DELETED_EVENT_CODE);
+	}
+	
+	private void eventDeletedAction() {
+		setupList();
+		Toast.makeText(this, "Event deleted", Toast.LENGTH_LONG).show();
+	}
+	
+	private void eventNotDeletedAction() {
+		Toast.makeText(this, "Problem deleting the event. Are you the creator?", Toast.LENGTH_LONG).show();
 	}
 }
