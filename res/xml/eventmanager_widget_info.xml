@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:initialLayout="@layout/eventmanager_widget"
+    android:label="@string/eventManagerWidgetTitle"
+    android:minHeight="72dp"
+    android:minWidth="294dp"
+    android:updatePeriodMillis="1800000" />
+
+<!-- Set the update time every 30 minutes. The widget will be updated also with
+     the broadcasts, so this is only if the broadcast fails -->

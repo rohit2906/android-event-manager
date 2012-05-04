@@ -50,8 +50,15 @@
     <string name="preferencesKeyStartOnBoot">startOnBoot</string>
     <string name="preferencesStartOnBootText">Start on Boot</string>
     <string name="preferencesStartOnBootSummary">Start updater service after boot</string>
+    <string name="preferencesKeyLocationProvider">locationProvider</string>
+    <string name="preferencesLocationProviderText">Location Provider</string>
+    <string name="preferencesLocationProviderSummary">Do you want to suggest your address when you are creating a new event?</string>
     
     <string name="pollerTitle">PollerService</string>
+    
+    <string name="eventProviderTitle">EventProvider</string>
+    
+    <string name="eventManagerWidgetTitle">Event Manager Widget</string>
     
     <string name="permissionSendEventsNotificationsLabel">Sends Events Notifications</string>
     <string name="permissionSendEventsNotificationsDescription">Allow this application to send events

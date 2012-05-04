@@ -44,5 +44,13 @@
         android:key="@string/preferencesKeyStartOnBoot"
         android:summary="@string/preferencesStartOnBootSummary"
         android:title="@string/preferencesStartOnBootText" />
+    
+   	<ListPreference
+   	    android:defaultValue="network"
+   	    android:key="@string/preferencesKeyLocationProvider"
+   	    android:entries="@array/locationProvidersStringsArray"
+   	    android:entryValues="@array/locationProvidersValuesArray"
+   	    android:title="@string/preferencesLocationProviderText"
+    	android:summary="@string/preferencesLocationProviderSummary" />
 
 </PreferenceScreen>

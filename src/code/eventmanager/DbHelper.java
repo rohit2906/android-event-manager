@@ -1,5 +1,7 @@
 package code.eventmanager;
 
+import java.util.Date;
+
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -60,10 +62,21 @@ public class DbHelper extends SQLiteOpenHelper {
 	}
 
 	/**
+	 * Return a Cursor with all the events
 	 * @return Cursor with all the events
 	 */
 	public Cursor getAllEvents() {
 		SQLiteDatabase db = getReadableDatabase();
 		return db.query(TABLE_EVENTS, null, null, null, null, null, EVENT_STARTING_TS + " DESC");
+	}
+	
+	/**
+	 * Return a Cursor with all the not yet finished events
+	 * @return Cursor with all the not yet finished events
+	 */
+	public Cursor getNotYetFinishedEvents() {
+		SQLiteDatabase db = getReadableDatabase();
+		return db.query(TABLE_EVENTS, null, EVENT_ENDING_TS + " > ?",
+				new String[] { Long.toString((new Date()).getTime()) }, null, null, EVENT_STARTING_TS + " DESC");
 	}
 }

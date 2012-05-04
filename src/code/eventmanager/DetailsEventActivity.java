@@ -1,7 +1,11 @@
 package code.eventmanager;
 
+import java.util.Date;
+
 import android.app.Activity;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -12,10 +16,11 @@ import android.widget.TextView;
 public class DetailsEventActivity extends Activity implements OnClickListener {
 
 	private static final String TAG = NewEventActivity.class.getSimpleName();
-	public static final int CODE_EVENT_DELETED = 5;
+
+	public static final String EVENT_DETAILS_ID = "EVENT_DETAILS_ID";
+	public static final int RESULT_EVENT_DELETED = 10;
 
 	EventManagerApp app;
-	public DbHelper dbHelper;
 
 	private TextView tvTitle;
 	private TextView tvStarting;
@@ -23,10 +28,10 @@ public class DetailsEventActivity extends Activity implements OnClickListener {
 	private TextView tvAddress;
 	private TextView tvDescription;
 
-	private int event_id;
-
 	private Button btnReturn;
 	private Button btnDelete;
+
+	private long eventId;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -37,28 +42,49 @@ public class DetailsEventActivity extends Activity implements OnClickListener {
 		app = (EventManagerApp) getApplication();
 
 		Intent callingIntent = this.getIntent();
-		event_id = callingIntent.getIntExtra(EventsActivity.EVENT_DETAILS_ID, -1);
+		eventId = callingIntent.getLongExtra(EVENT_DETAILS_ID, -1);
 
-		tvTitle = (TextView) findViewById(R.id.detailseventTextViewTitle);
-		tvTitle.setText(callingIntent.getStringExtra(EventsActivity.EVENT_DETAILS_NAME));
+		// event no more available in the database for some reason
+		if (eventId < 0) {
+			setResult(RESULT_EVENT_DELETED);
+			finish();
+		} else {
+			// Get the data from the database
+			SQLiteDatabase db = app.getDbHelper().getReadableDatabase();
+			Cursor cursor = db.query(DbHelper.TABLE_EVENTS, null,
+					DbHelper.EVENT_ID + "=?", new String[] { Long.toString(eventId) },
+					null, null, DbHelper.EVENT_STARTING_TS + " DESC", "1");
+			cursor.moveToFirst();
 
-		tvStarting = (TextView) findViewById(R.id.detailseventTextViewStarting);
-		tvStarting.setText(callingIntent.getStringExtra(EventsActivity.EVENT_DETAILS_STARTING));
+			// Write the data in the layout
+			tvTitle = (TextView) findViewById(R.id.detailseventTextViewTitle);
+			tvTitle.setText(cursor.getString(cursor.getColumnIndex(DbHelper.EVENT_NAME)));
 
-		tvEnding = (TextView) findViewById(R.id.detailseventTextViewEnding);
-		tvEnding.setText(callingIntent.getStringExtra(EventsActivity.EVENT_DETAILS_ENDING));
+			Date startingDate = new Date(cursor.getLong(cursor.getColumnIndex(DbHelper.EVENT_STARTING_TS)));
+			tvStarting = (TextView) findViewById(R.id.detailseventTextViewStarting);
+			tvStarting.setText(app.getDateTimeFormatted(startingDate));
 
-		tvAddress = (TextView) findViewById(R.id.detailseventTextViewAddress);
-		tvAddress.setText(callingIntent.getStringExtra(EventsActivity.EVENT_DETAILS_ADDRESS));
+			Date endingDate = new Date(cursor.getLong(cursor.getColumnIndex(DbHelper.EVENT_ENDING_TS)));
+			tvEnding = (TextView) findViewById(R.id.detailseventTextViewEnding);
+			tvEnding.setText(app.getDateTimeFormatted(endingDate));
 
-		tvDescription = (TextView) findViewById(R.id.detailseventTextViewDescription);
-		tvDescription.setText(callingIntent.getStringExtra(EventsActivity.EVENT_DETAILS_DESCRIPTION));
+			tvAddress = (TextView) findViewById(R.id.detailseventTextViewAddress);
+			tvAddress.setText(cursor.getString(cursor.getColumnIndex(DbHelper.EVENT_ADDRESS)));
 
-		btnReturn = (Button) findViewById(R.id.detailseventButtonReturn);
-		btnReturn.setOnClickListener(this);
+			tvDescription = (TextView) findViewById(R.id.detailseventTextViewDescription);
+			tvDescription.setText(cursor.getString(cursor.getColumnIndex(DbHelper.EVENT_DESCRIPTION)));
 
-		btnDelete = (Button) findViewById(R.id.detailseventButtonDelete);
-		btnDelete.setOnClickListener(this);
+			// Set buttons' listeners
+			btnReturn = (Button) findViewById(R.id.detailseventButtonReturn);
+			btnReturn.setOnClickListener(this);
+
+			btnDelete = (Button) findViewById(R.id.detailseventButtonDelete);
+			btnDelete.setOnClickListener(this);
+
+			// Close the cursor and the database
+			cursor.close();
+			db.close();
+		}
 	}
 
 	@Override
@@ -67,18 +93,24 @@ public class DetailsEventActivity extends Activity implements OnClickListener {
 		switch (v.getId()) {
 		case R.id.detailseventButtonReturn:
 			Log.d(TAG, "finished");
+			
+			// Close the activity
 			finish();
 			break;
 
 		case R.id.detailseventButtonDelete:
-			if (this.event_id != -1) {
-				if (app.deleteEvent(event_id)) {
-					Log.d(TAG, "event deleted");
-					setResult(CODE_EVENT_DELETED);
-					finish();
-				}
+			if (app.deleteEvent((int) eventId)) {
+				Log.d(TAG, "event deleted");
+				
+				// Set the return code of the activity
+				setResult(RESULT_EVENT_DELETED);
+				
+				// Update the widget
+				sendBroadcast(new Intent(EventManagerWidget.REFRESH_WIDGET));
+				
+				// Close the activity
+				finish();
 			}
-			
 			break;
 		}
 	}
