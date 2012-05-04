@@ -1,13 +1,7 @@
 package code.eventmanager;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import code.eventmanager.auth.AndroidAuthenticator;
-import com.pras.SpreadSheet;
-import com.pras.SpreadSheetFactory;
-import com.pras.WorkSheet;
-import com.pras.WorkSheetCell;
-import com.pras.WorkSheetRow;
+import java.util.Date;
 
 import android.accounts.AccountManager;
 import android.app.AlarmManager;
@@ -21,11 +15,21 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
+import android.text.format.DateFormat;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.widget.Toast;
+
+import code.eventmanager.auth.AndroidAuthenticator;
+
+import com.pras.SpreadSheet;
+import com.pras.SpreadSheetFactory;
+import com.pras.WorkSheet;
+import com.pras.WorkSheetCell;
+import com.pras.WorkSheetRow;
 
 /**
  * 
@@ -33,9 +37,12 @@ import android.widget.Toast;
  * other activities
  */
 public class EventManagerApp extends Application implements
-		OnSharedPreferenceChangeListener {
+OnSharedPreferenceChangeListener {
 
 	private static final String TAG = EventManagerApp.class.getSimpleName();
+
+	public static final String LOCATION_PROVIDER_NONE = "NO";
+	private static final int ALARM_DISABLED = 0;
 
 	private SharedPreferences prefs;
 	private SpreadSheetFactory spreadsheetFactory;
@@ -43,8 +50,6 @@ public class EventManagerApp extends Application implements
 	private int lastSavedEventId = -1;
 	private String spreadSheetKey;
 	public DbHelper dbHelper;
-
-	private static final int ALARM_DISABLED = 0;
 
 	/**
 	 * Reference to preferences and registration to their changes. Also instance
@@ -90,14 +95,10 @@ public class EventManagerApp extends Application implements
 			} else {
 				// check if user e-mail and password are emptyString email =
 				// prefs.getString(
-				String email = prefs
-						.getString(
-								(String) getText(R.string.preferencesKeyCustomAccountMail),
-								"");
-				String password = prefs
-						.getString(
-								(String) getText(R.string.preferencesKeyCustomAccountPassword),
-								"");
+				String email = prefs.getString(
+						(String) getText(R.string.preferencesKeyCustomAccountMail), "");
+				String password = prefs.getString(
+						(String) getText(R.string.preferencesKeyCustomAccountPassword), "");
 
 				if (email.isEmpty() || password.isEmpty())
 					Log.i(TAG, "No account set");
@@ -111,12 +112,9 @@ public class EventManagerApp extends Application implements
 		else if (key == getText(R.string.preferencesKeyCustomAccountMail)
 				|| key == getText(R.string.preferencesKeyCustomAccountPassword)) {
 			String email = prefs.getString(
-					(String) getText(R.string.preferencesKeyCustomAccountMail),
-					"");
-			String password = prefs
-					.getString(
-							(String) getText(R.string.preferencesKeyCustomAccountPassword),
-							"");
+					(String) getText(R.string.preferencesKeyCustomAccountMail), "");
+			String password = prefs.getString(
+					(String) getText(R.string.preferencesKeyCustomAccountPassword), "");
 
 			if (email != "" && password != "")
 				setAnotherAccount(email, password);
@@ -130,11 +128,30 @@ public class EventManagerApp extends Application implements
 
 	/**
 	 * Get the reference to the preferences
-	 * 
 	 * @return reference to preferences
 	 */
 	public SharedPreferences getPrefs() {
 		return prefs;
+	}
+
+	/**
+	 * Return the minutes between automatic updates
+	 * @return the minutes between automatic updates
+	 */
+	public int getMinutesBetweenUpdates() {
+		return Integer.parseInt(prefs.getString(
+				getText(R.string.preferencesKeyMinutesBetweenUpdates)
+				.toString().trim(), "1"));
+	}
+
+	/**
+	 * Return the preference for the Location Provider
+	 * @return the preference for the Location Provider
+	 */
+	public String getLocationProvider() {
+		return prefs.getString(getText(
+				R.string.preferencesKeyLocationProvider).toString(),
+				LocationManager.NETWORK_PROVIDER);
 	}
 
 	/**
@@ -169,13 +186,15 @@ public class EventManagerApp extends Application implements
 		spreadsheetFactory = SpreadSheetFactory.getInstance(email, password);
 	}
 
+	public void setLastSavedEventsId(int lastSavedEventId) {
+		this.lastSavedEventId = lastSavedEventId;
+	}
+
 	/**
 	 * Parse the events in the spreadsheet
 	 * 
-	 * @param spreadsheet
-	 *            the spreadsheet with events
-	 * @param worksheet
-	 *            the spreadsheet with events
+	 * @param spreadsheet the spreadsheet with events
+	 * @param worksheet the spreadsheet with events
 	 */
 	public int parseEvents() {
 		WorkSheet ws = getWorkSheet();
@@ -187,34 +206,40 @@ public class EventManagerApp extends Application implements
 		int newEvents = 0;
 
 		for (int i = 0; i < rows.size(); i++) {
-			ArrayList<WorkSheetCell> wsc = rows.get(i).getCells(); // get the
-																	// cells in
-																	// that row
+			// get the cell in that row
+			ArrayList<WorkSheetCell> wsc = rows.get(i).getCells();
 			int id = Integer.parseInt(wsc.get(0).getValue());
 
 			// Put in the database only the new events
 			if (id > maxId) {
 				maxId = id;
+				long endingTime = Long.parseLong(wsc.get(6).getValue());
 
-				// clear the database record
-				record.clear();
+				// check if the event is already finished
+				if (endingTime > (new Date()).getTime()) {
+					// clear the database record
+					record.clear();
 
-				record.put(DbHelper.EVENT_ID, id);
-				record.put(DbHelper.EVENT_NAME, wsc.get(1).getValue());
-				record.put(DbHelper.EVENT_ADDRESS, wsc.get(2).getValue());
-				record.put(DbHelper.EVENT_DESCRIPTION, wsc.get(3).getValue());
-				record.put(DbHelper.EVENT_CREATOR, wsc.get(4).getValue());
-				record.put(DbHelper.EVENT_STARTING_TS,
-						Long.parseLong(wsc.get(5).getValue()));
-				record.put(DbHelper.EVENT_ENDING_TS,
-						Long.parseLong(wsc.get(6).getValue()));
+					record.put(DbHelper.EVENT_ID, id);
+					record.put(DbHelper.EVENT_NAME, wsc.get(1).getValue());
+					record.put(DbHelper.EVENT_ADDRESS, wsc.get(2).getValue());
+					record.put(DbHelper.EVENT_DESCRIPTION, wsc.get(3).getValue());
+					record.put(DbHelper.EVENT_CREATOR, wsc.get(4).getValue());
+					record.put(DbHelper.EVENT_STARTING_TS,
+							Long.parseLong(wsc.get(5).getValue()));
+					record.put(DbHelper.EVENT_ENDING_TS, endingTime);
 
-				if (insertOrIgnore(record))
-					newEvents++;
+					if (insertOrIgnore(record))
+						newEvents++;
+
+					Log.v(TAG, "Event Added to the Database");
+				} else {
+					Log.v(TAG, "Event Already Finished");
+				}
 			}
 		}
 
-		lastSavedEventId = maxId;
+		lastSavedEventId = Math.max(maxId, lastSavedEventId);
 		return newEvents;
 	}
 
@@ -224,9 +249,7 @@ public class EventManagerApp extends Application implements
 	 */
 	public void setAlarmForPollerFromPreferences() {
 		Log.d(TAG, "Updating poller alarm");
-		int minutes = Integer.parseInt(prefs.getString(
-				getText(R.string.preferencesKeyMinutesBetweenUpdates)
-						.toString().trim(), "1"));
+		int minutes = getMinutesBetweenUpdates();
 		if (minutes >= 0)
 			setPollerAlarm(minutes);
 	}
@@ -272,11 +295,18 @@ public class EventManagerApp extends Application implements
 
 	/**
 	 * Return all the events.
-	 * 
 	 * @return A cursor with all the events in the database.
 	 */
 	public Cursor getAllEvents() {
 		return dbHelper.getAllEvents();
+	}
+
+	/**
+	 * Return a Cursor with all the not yet finished events
+	 * @return Cursor with all the not yet finished events
+	 */
+	public Cursor getNotYetFinishedEvents() {
+		return dbHelper.getNotYetFinishedEvents();
 	}
 
 	/**
@@ -340,7 +370,7 @@ public class EventManagerApp extends Application implements
 	 * @return the current maximum Event ID in the database or -1 if there are
 	 *         no entries.
 	 */
-	public int getMaxEventId(SQLiteDatabase db) {
+	public int getMaxDbEventId(SQLiteDatabase db) {
 		boolean dbAlreadyOpen = true;
 
 		if (db == null) {
@@ -360,30 +390,6 @@ public class EventManagerApp extends Application implements
 		return max;
 	}
 
-	/**
-	 * Convert a date into a timestamp
-	 * 
-	 * @param year
-	 * @param month
-	 * @param day
-	 * @param hour
-	 * @param minute
-	 * 
-	 * @return milliseconds
-	 */
-	public long date2Timestamp(int year, int month, int day, int hour,
-			int minute) {
-		Calendar c = Calendar.getInstance();
-		c.set(Calendar.YEAR, year);
-		c.set(Calendar.MONTH, month);
-		c.set(Calendar.DAY_OF_MONTH, day);
-		c.set(Calendar.HOUR, hour);
-		c.set(Calendar.MINUTE, minute);
-		c.set(Calendar.SECOND, 0);
-		c.set(Calendar.MILLISECOND, 0);
-		return c.getTimeInMillis();
-	}
-
 	public CharSequence timestamp2Date(long timestamp) {
 		CharSequence realTime = DateUtils.getRelativeTimeSpanString(
 				getApplicationContext(), timestamp);
@@ -400,7 +406,7 @@ public class EventManagerApp extends Application implements
 		boolean checked = this.getPrefs()
 				.getBoolean(
 						getText(R.string.preferencesKeyDefaultAccount)
-								.toString(), true);
+						.toString(), true);
 		if (checked) {
 			AccountManager manager = AccountManager
 					.get(getApplicationContext());
@@ -408,7 +414,7 @@ public class EventManagerApp extends Application implements
 		} else {
 			username = this.getPrefs().getString(
 					getText(R.string.preferencesKeyCustomAccountMail)
-							.toString(), "");
+					.toString(), "");
 		}
 		return username;
 	}
@@ -444,8 +450,7 @@ public class EventManagerApp extends Application implements
 			if (eventsDeleted > 0) {
 				Log.d(TAG, "Event deleted from the database");
 				new DeleteEventOnSpreadsheet().execute(arrayId);
-				Toast.makeText(this, "Event deleted.", Toast.LENGTH_LONG)
-						.show();
+				Toast.makeText(this, "Event deleted.", Toast.LENGTH_LONG).show();
 				return true;
 			}
 
@@ -455,12 +460,8 @@ public class EventManagerApp extends Application implements
 					Toast.LENGTH_LONG).show();
 			return false;
 		}
-		Toast.makeText(
-				this,
-				"You are not the creator of the event.", Toast.LENGTH_LONG).show();
-		Log.d(TAG,
-				"Deletion not allowed. " + currentUser + "!= "
-						+ creator);
+		Toast.makeText(this, "You are not the creator of the event.", Toast.LENGTH_LONG).show();
+		Log.d(TAG, "Deletion not allowed. " + currentUser + "!= " + creator);
 		return false;
 	}
 
@@ -492,7 +493,7 @@ public class EventManagerApp extends Application implements
 		// Get the lastSavedEventId from database if it is the first loop of the
 		// parsing
 		if (lastSavedEventId == -1)
-			lastSavedEventId = getMaxEventId(null);
+			lastSavedEventId = getMaxDbEventId(null);
 
 		Log.d(TAG, "Spreadsheets found.");
 		return spreadsheets.get(0).getAllWorkSheets().get(0);
@@ -525,5 +526,35 @@ public class EventManagerApp extends Application implements
 			Log.d(TAG, "Event deleted from the spreadsheet");
 			return "";
 		}
+	}
+
+	/**
+	 * Return the date formatted like Mon, Apr 6 1970
+	 * 
+	 * @param date the date to format (the time information is not processed)
+	 * @return the date formatted like Mon, Apr 6 1970
+	 */
+	public CharSequence getDateFormatted(Date date) {
+		return DateFormat.format("E, MMM dd yyyy", date);
+	}
+
+	/**
+	 * The time formatted in 12 hours
+	 * 
+	 * @param time the time to convert (the date information is not processed)
+	 * @return the time formatted like 3:23am
+	 */
+	public CharSequence getTimeFormatted(Date time) {
+		return DateFormat.format("h:mmaa", time);
+	}
+
+	/**
+	 * Return the date and the time formatted like Mon, Apr 6 1970 - 3:23am
+	 * 
+	 * @param datetime the Date to format
+	 * @return the date formatted like Mon, Apr 6 1970 - 3:23am
+	 */
+	public CharSequence getDateTimeFormatted(Date datetime) {
+		return DateFormat.format("E, MMM dd yyyy - h:mmaa", datetime);
 	}
 }

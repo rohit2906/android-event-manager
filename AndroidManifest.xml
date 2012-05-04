@@ -6,12 +6,6 @@
     android:versionName="1.0" >
 
     <uses-sdk android:minSdkVersion="10" />
-
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
-    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
-    <uses-permission android:name="code.eventmanager.SEND_EVENTS_NOTIFICATIONS" />
-    <uses-permission android:name="code.eventmanager.RECEIVE_EVENTS_NOTIFICATIONS" />
     
     <permission android:name="code.eventmanager.SEND_EVENTS_NOTIFICATIONS"
     android:label="@string/permissionSendEventsNotificationsLabel"
@@ -19,12 +13,21 @@
     android:permissionGroup="android.permission-group.PERSONAL_INFO"
     android:protectionLevel="normal" />
 
-    <permission android:name="code.eventmanager.RECEIVE_EVENTS_NOTIFICATIONS"
+    <permission android:name="code.eventmanager.RECEIVE_EVENTS_NOTIFICATION"
     android:label="@string/permissionReceiveEventsNotificationsLabel"
     android:description="@string/permissionReceiveEventsNotificationsDescription"
     android:permissionGroup="android.permission-group.PERSONAL_INFO"
     android:protectionLevel="normal" />
 
+    <uses-permission android:name="code.eventmanager.SEND_EVENTS_NOTIFICATIONS" />
+    <uses-permission android:name="code.eventmanager.RECEIVE_EVENTS_NOTIFICATION" />
+    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    
     <application android:name=".EventManagerApp" android:icon="@drawable/ic_launcher"
         android:label="@string/eventManagerTitle" >
         
@@ -35,15 +38,30 @@
             </intent-filter>
         </activity>
         
-        <activity android:name=".LoginActivity" android:label="@string/loginTitle" android:noHistory="true" />
-        <activity android:name=".CredentialsActivity" android:label="@string/credentialsTitle" android:noHistory="true" />
+        <activity android:name=".LoginActivity" android:label="@string/loginTitle" android:noHistory="true" android:launchMode="singleTop" android:windowSoftInputMode="stateVisible|adjustPan" />
+        <activity android:name=".CredentialsActivity" android:label="@string/credentialsTitle" android:noHistory="true" android:launchMode="singleTop" android:windowSoftInputMode="stateVisible|adjustPan" />
         <activity android:name=".PreferencesActivity" android:label="@string/preferencesTitle" />
-        <activity android:name=".EventsActivity" android:label="@string/eventsTitle" />
-        <activity android:name=".NewEventActivity" android:label="@string/neweventTitle" />
-        <activity android:name=".DetailsEventActivity" android:label="@string/detailseventTitle" />
+        <activity android:name=".EventsActivity" android:label="@string/eventsTitle" android:launchMode="singleTop" />
+        <activity android:name=".NewEventActivity" android:label="@string/neweventTitle" android:launchMode="singleTop" android:windowSoftInputMode="stateVisible|adjustPan" />
+        <activity android:name=".DetailsEventActivity" android:label="@string/detailseventTitle" android:launchMode="singleTop" />
 
         <service android:name=".PollerService" android:label="@string/pollerTitle" />
         
+        <provider android:name=".EventProvider" android:label="@string/eventProviderTitle" android:authorities="code.eventmanager.eventprovider" />
+        
+        <receiver android:name=".EventManagerWidget" android:label="@string/eventManagerWidgetTitle">
+			<intent-filter>
+				<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+			</intent-filter>
+			<intent-filter>
+				<action android:name="code.eventmanager.NEW_EVENTS" />
+			</intent-filter>
+			<intent-filter>
+				<action android:name="code.eventmanager.REFRESH_WIDGET" />
+			</intent-filter>	    
+			<meta-data android:name="android.appwidget.provider" android:resource="@xml/eventmanager_widget_info" />
+		</receiver>
+        
     </application>
-
+    
 </manifest>

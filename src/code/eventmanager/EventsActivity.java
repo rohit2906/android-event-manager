@@ -32,17 +32,11 @@ import android.widget.Toast;
 public class EventsActivity extends Activity implements OnClickListener, OnItemLongClickListener, OnItemClickListener {
 
 	private static final String TAG = EventsActivity.class.getSimpleName();
-	static final String SEND_EVENTS_NOTIFICATIONS = "code.eventmanager.SEND_EVENTS_NOTIFICATIONS";
-	private static final int NEW_EVENT_ACTIVITY_CODE = 0;
-	private static final int DETAILS_ACTIVITY_DELETED_EVENT_CODE = 1;
 
-	public static final String EVENT_DETAILS_ID = "EVENT_DETAILS_ID";
-	public static final String EVENT_DETAILS_NAME = "EVENT_DETAILS_NAME";
-	public static final String EVENT_DETAILS_ADDRESS = "EVENT_DETAILS_ADDRESS";
-	public static final String EVENT_DETAILS_DESCRIPTION = "EVENT_DETAILS_DESCRIPTION";
-	public static final String EVENT_DETAILS_CREATOR = "EVENT_DETAILS_CREATOR";
-	public static final String EVENT_DETAILS_STARTING = "EVENT_DETAILS_STARTING";
-	public static final String EVENT_DETAILS_ENDING = "EVENT_DETAILS_ENDING";
+	private static final int NEW_EVENT_ACTIVITY_REQUEST_CODE = 0;
+	private static final int DETAILS_ACTIVITY_REQUEST_CODE = 1;
+
+	public static final String SEND_EVENTS_NOTIFICATIONS = "code.eventmanager.SEND_EVENTS_NOTIFICATIONS";
 
 	Button buttonNewEvent;
 	Intent pollerServiceIntent;
@@ -75,33 +69,37 @@ public class EventsActivity extends Activity implements OnClickListener, OnItemL
 		buttonNewEvent = (Button) findViewById(R.id.eventsButtonNewEvent);
 		buttonNewEvent.setOnClickListener(this);
 
-		// set the alarm for the PollerService
-		app.setAlarmForPollerFromPreferences();
-
 		Log.d(TAG, "Set the receiver and the filter");
 		receiver = new EventsReceiver();
 		filter = new IntentFilter(PollerService.NEW_EVENTS_INTENT);
+
+		// set the alarm for the PollerService
+		app.setAlarmForPollerFromPreferences();
 	}
 
 	@Override
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.eventsButtonNewEvent:
-			startActivityForResult(new Intent(this, NewEventActivity.class), NEW_EVENT_ACTIVITY_CODE);
+			startActivityForResult(new Intent(this, NewEventActivity.class), NEW_EVENT_ACTIVITY_REQUEST_CODE);
 			break;
 		}
 	}
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (requestCode == NEW_EVENT_ACTIVITY_CODE) {
-			if (resultCode == RESULT_OK)
-				Toast.makeText(this, "Event created", Toast.LENGTH_LONG).show();
-			else if (resultCode == RESULT_CANCELED)
-				Toast.makeText(this, "Problems with the creation of the event. Try again.", Toast.LENGTH_LONG).show();
-		} else if (requestCode == DETAILS_ACTIVITY_DELETED_EVENT_CODE) {
-			if (resultCode == DetailsEventActivity.CODE_EVENT_DELETED)
+		switch (requestCode) {
+		case NEW_EVENT_ACTIVITY_REQUEST_CODE:
+			if (resultCode == NewEventActivity.RESULT_EVENT_CREATED)
+				eventCreatedAction();
+			else if (resultCode == NewEventActivity.RESULT_EVENT_ERROR)
+				eventNotCreatedAction();
+			break;
+
+		case DETAILS_ACTIVITY_REQUEST_CODE:
+			if (resultCode == DetailsEventActivity.RESULT_EVENT_DELETED)
 				eventDeletedAction();
+			break;
 		}
 	}
 
@@ -125,7 +123,7 @@ public class EventsActivity extends Activity implements OnClickListener, OnItemL
 
 		case R.id.menuItemNewEvent:
 			startActivityForResult(new Intent(this, NewEventActivity.class),
-					NEW_EVENT_ACTIVITY_CODE);
+					NEW_EVENT_ACTIVITY_REQUEST_CODE);
 			break;
 		}
 		return true;
@@ -139,6 +137,8 @@ public class EventsActivity extends Activity implements OnClickListener, OnItemL
 		super.onResume();
 		Log.v(TAG, "onResume");
 		this.setupList();
+
+		// this permission is a requirement for anyone who wants to send us this type of broadcast.
 		super.registerReceiver(receiver, filter, SEND_EVENTS_NOTIFICATIONS, null);
 	}
 
@@ -232,22 +232,26 @@ public class EventsActivity extends Activity implements OnClickListener, OnItemL
 		Cursor cursor = ((SimpleCursorAdapter) a.getAdapter()).getCursor();
 		cursor.moveToPosition(position);
 		Intent intent = new Intent(this, DetailsEventActivity.class);
-		intent.putExtra(EVENT_DETAILS_ID, (int) id);
-		intent.putExtra(EVENT_DETAILS_NAME, cursor.getString(1));
-		intent.putExtra(EVENT_DETAILS_ADDRESS, cursor.getString(2));
-		intent.putExtra(EVENT_DETAILS_DESCRIPTION, cursor.getString(3));
-		intent.putExtra(EVENT_DETAILS_CREATOR, cursor.getString(4));
-		intent.putExtra(EVENT_DETAILS_STARTING, app.timestamp2Date(cursor.getLong(5)));
-		intent.putExtra(EVENT_DETAILS_ENDING, app.timestamp2Date(cursor.getLong(6)));
-		startActivityForResult(intent, DETAILS_ACTIVITY_DELETED_EVENT_CODE);
+		intent.putExtra(DetailsEventActivity.EVENT_DETAILS_ID, id);
+		startActivityForResult(intent, DETAILS_ACTIVITY_REQUEST_CODE);
 	}
-	
+
 	private void eventDeletedAction() {
 		setupList();
 		Toast.makeText(this, "Event deleted", Toast.LENGTH_LONG).show();
 	}
-	
+
 	private void eventNotDeletedAction() {
 		Toast.makeText(this, "Problem deleting the event. Are you the creator?", Toast.LENGTH_LONG).show();
+	}
+
+	private void eventCreatedAction() {
+		setupList();
+		Toast.makeText(this, "Event created", Toast.LENGTH_LONG).show();
+		sendBroadcast(new Intent(EventManagerWidget.REFRESH_WIDGET));
+	}
+
+	private void eventNotCreatedAction() {
+		Toast.makeText(this, "Problems with the creation of the event. Try again.", Toast.LENGTH_LONG).show();
 	}
 }

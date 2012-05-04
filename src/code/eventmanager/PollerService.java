@@ -55,6 +55,7 @@ public class PollerService extends IntentService {
 		// Send the Broadcast
 		if (newEventsIntent != null) {
 			sendBroadcast(newEventsIntent, RECEIVE_EVENTS_NOTIFICATIONS);
+			Log.d(TAG, "newEventsIntent Broadcasted");
 		}
 	}
 
@@ -78,11 +79,15 @@ public class PollerService extends IntentService {
 		// Cancel this notification as soon as the user clicks on it
 		notification.flags |= Notification.FLAG_AUTO_CANCEL;
 		
+		// Adding a couple of extra features :)
+		notification.defaults |= Notification.DEFAULT_SOUND;
+		notification.defaults |= Notification.DEFAULT_VIBRATE;
+		
 		// Set the title and the summary
 		CharSequence notificationTitle = getText(R.string.notificationTitle);
 		CharSequence notificationSummary = createNotificationSummaryString(newEventsCount);
 		
-		// Set the information in the notification 
+		// Set the information in the notification
 		notification.setLatestEventInfo(this, notificationTitle, notificationSummary, pendingIntent);
 		notificationManager.notify(0, notification);
 	}
