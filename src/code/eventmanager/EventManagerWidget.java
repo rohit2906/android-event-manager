@@ -18,8 +18,6 @@ public class EventManagerWidget extends AppWidgetProvider {
 	
 	public static final String REFRESH_WIDGET = "code.eventmanager.REFRESH_WIDGET";
 	
-	private static final int WIDGET_DETAIL_REQUESTCODE = 21;
-	
 	private static PendingIntent pendingIntent;
 
 	/**
@@ -33,7 +31,7 @@ public class EventManagerWidget extends AppWidgetProvider {
 				new String[] { Long.toString((new Date()).getTime()) },
 				DbHelper.EVENT_STARTING_TS + " DESC");
 		try {
-			CharSequence name = "No events";
+			CharSequence name = context.getText(R.string.eventManagerWidgetNoEvents);
 			CharSequence startingTime = "";
 			CharSequence address = "";
 
@@ -43,9 +41,10 @@ public class EventManagerWidget extends AppWidgetProvider {
 						.getLong(cursor.getColumnIndex(DbHelper.EVENT_STARTING_TS)));
 				address = cursor.getString(cursor.getColumnIndex(DbHelper.EVENT_ADDRESS));
 				long id = cursor.getLong(cursor.getColumnIndex(DbHelper.EVENT_ID));
-				Intent intent = new Intent(context, DetailsEventActivity.class);
-				intent.putExtra(DetailsEventActivity.EVENT_DETAILS_ID, id);
-				pendingIntent = PendingIntent.getActivity(context, WIDGET_DETAIL_REQUESTCODE, intent, 0);
+				Intent intent = new Intent(context, DetailsActivity.class);
+				intent.putExtra(DetailsActivity.EVENT_DETAILS_ID, id);
+				pendingIntent = PendingIntent.getActivity(context, -1, intent,
+						PendingIntent.FLAG_UPDATE_CURRENT);
 			} else if (pendingIntent != null) {
 				pendingIntent.cancel();
 			}

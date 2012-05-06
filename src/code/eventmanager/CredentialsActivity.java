@@ -46,9 +46,11 @@ public class CredentialsActivity extends Activity implements OnClickListener {
 		String username = etUsername.getText().toString();
 		String password = etPassword.getText().toString();
 		if (username.isEmpty()) {
-			Toast.makeText(this, "Write your username", Toast.LENGTH_LONG).show();
+			Toast.makeText(this, getText(R.string.credentialsToastMissingUsername),
+					Toast.LENGTH_LONG).show();
 		} else if (password.isEmpty()) {
-			Toast.makeText(this, "Write your password", Toast.LENGTH_LONG).show();
+			Toast.makeText(this, getText(R.string.credentialsToastMissingPassword),
+					Toast.LENGTH_LONG).show();
 		} else {
 			Editor editor = app.getPrefs().edit();
 			

@@ -74,7 +74,7 @@ public class EventsActivity extends Activity implements OnClickListener, OnItemL
 		filter = new IntentFilter(PollerService.NEW_EVENTS_INTENT);
 
 		// set the alarm for the PollerService
-		app.setAlarmForPollerFromPreferences();
+		app.setPollerAlarmFromPreferences();
 	}
 
 	@Override
@@ -97,7 +97,7 @@ public class EventsActivity extends Activity implements OnClickListener, OnItemL
 			break;
 
 		case DETAILS_ACTIVITY_REQUEST_CODE:
-			if (resultCode == DetailsEventActivity.RESULT_EVENT_DELETED)
+			if (resultCode == DetailsActivity.RESULT_EVENT_DELETED)
 				eventDeletedAction();
 			break;
 		}
@@ -196,7 +196,9 @@ public class EventsActivity extends Activity implements OnClickListener, OnItemL
 
 			if (receivedEvents < 0) {
 				// Impossible to get the spreadsheet. Show a toast
-				Toast.makeText(EventsActivity.this, "Impossible to get the spreadsheet. Have you set the account?", Toast.LENGTH_LONG).show();
+				Toast.makeText(EventsActivity.this,
+						getText(R.string.eventsToastImpossibleGetSpreadsheet),
+						Toast.LENGTH_LONG).show();
 				Log.w(TAG, "Broadcast with -1 count. Impossible to get spreadsheets");
 			} else if (receivedEvents > 0) {
 				Log.v(TAG, receivedEvents + " events received");
@@ -207,22 +209,35 @@ public class EventsActivity extends Activity implements OnClickListener, OnItemL
 
 	@Override
 	public boolean onItemLongClick(AdapterView<?> a, View v, int position, final long rowId) {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setMessage("Are you sure you want to delete it?").setCancelable(false)
-		.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+		AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+		alertDialog.setMessage(getText(R.string.alertDialogDeleteConfirmation));
+		alertDialog.setCancelable(true);
+		
+		alertDialog.setPositiveButton(getText(R.string.yes), new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {
-				if (app.deleteEvent((int)rowId))
+				if (app.deleteEvent((int)rowId)) {
 					eventDeletedAction();
-				else
+					
+					// Update the widget
+					// We are not doing that in the eventDeletedAction() because
+					// that one is not called if you are deleting an item from
+					// a DetailsActivity called from the widget. So we have the
+					// refresh in the DetailsActivity, but this is another way
+					// to delete the event without using the DetailsActivity.
+					sendBroadcast(new Intent(EventManagerWidget.REFRESH_WIDGET));
+				} else {
 					eventNotDeletedAction();
+				}
 			}
-		})
-		.setNegativeButton("No", new DialogInterface.OnClickListener() {
+		});
+		
+		alertDialog.setNegativeButton(getText(R.string.no), new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {
 				dialog.cancel();
 			}
 		});
-		builder.show();
+		
+		alertDialog.show();
 		return true;
 	}
 
@@ -231,27 +246,27 @@ public class EventsActivity extends Activity implements OnClickListener, OnItemL
 
 		Cursor cursor = ((SimpleCursorAdapter) a.getAdapter()).getCursor();
 		cursor.moveToPosition(position);
-		Intent intent = new Intent(this, DetailsEventActivity.class);
-		intent.putExtra(DetailsEventActivity.EVENT_DETAILS_ID, id);
+		Intent intent = new Intent(this, DetailsActivity.class);
+		intent.putExtra(DetailsActivity.EVENT_DETAILS_ID, id);
 		startActivityForResult(intent, DETAILS_ACTIVITY_REQUEST_CODE);
 	}
 
 	private void eventDeletedAction() {
 		setupList();
-		Toast.makeText(this, "Event deleted", Toast.LENGTH_LONG).show();
+		Toast.makeText(this, getText(R.string.toastEventDeleted), Toast.LENGTH_LONG).show();
 	}
 
 	private void eventNotDeletedAction() {
-		Toast.makeText(this, "Problem deleting the event. Are you the creator?", Toast.LENGTH_LONG).show();
+		Toast.makeText(this, getText(R.string.eventsToastProblemDeleting), Toast.LENGTH_LONG).show();
 	}
 
 	private void eventCreatedAction() {
 		setupList();
-		Toast.makeText(this, "Event created", Toast.LENGTH_LONG).show();
+		Toast.makeText(this, getText(R.string.toastEventCreated), Toast.LENGTH_LONG).show();
 		sendBroadcast(new Intent(EventManagerWidget.REFRESH_WIDGET));
 	}
 
 	private void eventNotCreatedAction() {
-		Toast.makeText(this, "Problems with the creation of the event. Try again.", Toast.LENGTH_LONG).show();
+		Toast.makeText(this, getText(R.string.toastProblemsCreating), Toast.LENGTH_LONG).show();
 	}
 }

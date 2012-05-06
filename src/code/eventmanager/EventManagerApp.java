@@ -16,13 +16,14 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.text.format.DateFormat;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.widget.Toast;
-
 import code.eventmanager.auth.AndroidAuthenticator;
 
 import com.pras.SpreadSheet;
@@ -42,11 +43,12 @@ OnSharedPreferenceChangeListener {
 	private static final String TAG = EventManagerApp.class.getSimpleName();
 
 	public static final String LOCATION_PROVIDER_NONE = "NO";
-	private static final int ALARM_DISABLED = 0;
+	public static final int ALARM_DISABLED = 0;
 
 	private SharedPreferences prefs;
 	private SpreadSheetFactory spreadsheetFactory;
 	private AlarmManager alarmManager;
+	private ConnectivityManager connectivityManager;
 	private int lastSavedEventId = -1;
 	private String spreadSheetKey;
 	public DbHelper dbHelper;
@@ -66,14 +68,9 @@ OnSharedPreferenceChangeListener {
 
 		// Get the alarm service from the system
 		alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-	}
 
-	@Override
-	public void onTerminate() {
-		super.onTerminate();
-		// TODO remove later or put a preference like "run in background
-		setPollerAlarm(ALARM_DISABLED);
-		Log.i(TAG, "onTerminated");
+		// Get the connectivity service from the system
+		connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 	}
 
 	/**
@@ -122,7 +119,7 @@ OnSharedPreferenceChangeListener {
 
 		else if (key == getText(R.string.preferencesKeyMinutesBetweenUpdates)) {
 			Log.d(TAG, "Change update timer");
-			setAlarmForPollerFromPreferences();
+			setPollerAlarmFromPreferences();
 		}
 	}
 
@@ -142,6 +139,36 @@ OnSharedPreferenceChangeListener {
 		return Integer.parseInt(prefs.getString(
 				getText(R.string.preferencesKeyMinutesBetweenUpdates)
 				.toString().trim(), "1"));
+	}
+
+	/**
+	 * Return the preference for starting at boot
+	 * @return the preference for starting at boot
+	 */
+	public boolean getStartOnBoot() {
+		return prefs.getBoolean(
+				getText(R.string.preferencesKeyDefaultAccount)
+				.toString(), true);
+	}
+	
+	/**
+	 * Return the preference for notification sound
+	 * @return the preference for notification sound
+	 */
+	public boolean getNotificationSound() {
+		return prefs.getBoolean(
+				getText(R.string.preferencesKeyNotificationSound)
+				.toString(), true);
+	}
+	
+	/**
+	 * Return the preference for notification vibration
+	 * @return the preference for notification vibration
+	 */
+	public boolean getNotificationVibration() {
+		return prefs.getBoolean(
+				getText(R.string.preferencesKeyNotificationVibration)
+				.toString(), true);
 	}
 
 	/**
@@ -198,25 +225,24 @@ OnSharedPreferenceChangeListener {
 	 */
 	public int parseEvents() {
 		WorkSheet ws = getWorkSheet();
-		ArrayList<WorkSheetRow> rows = ws.getData(false);
-		Log.v(TAG, "Number of rows: " + rows.size());
+		if (ws != null) {
+			ArrayList<WorkSheetRow> rows = ws.getData(false);
+			Log.v(TAG, "Number of rows: " + rows.size());
 
-		int maxId = lastSavedEventId;
-		ContentValues record = new ContentValues();
-		int newEvents = 0;
+			int maxId = lastSavedEventId;
+			ContentValues record = new ContentValues();
+			int newEvents = 0;
 
-		for (int i = 0; i < rows.size(); i++) {
-			// get the cell in that row
-			ArrayList<WorkSheetCell> wsc = rows.get(i).getCells();
-			int id = Integer.parseInt(wsc.get(0).getValue());
+			for (int i = 0; i < rows.size(); i++) {
+				// get the cell in that row
+				ArrayList<WorkSheetCell> wsc = rows.get(i).getCells();
+				int id = Integer.parseInt(wsc.get(0).getValue());
 
-			// Put in the database only the new events
-			if (id > maxId) {
-				maxId = id;
-				long endingTime = Long.parseLong(wsc.get(6).getValue());
+				// Put in the database only the new events
+				if (id > maxId) {
+					maxId = id;
+					long endingTime = Long.parseLong(wsc.get(6).getValue());
 
-				// check if the event is already finished
-				if (endingTime > (new Date()).getTime()) {
 					// clear the database record
 					record.clear();
 
@@ -233,21 +259,21 @@ OnSharedPreferenceChangeListener {
 						newEvents++;
 
 					Log.v(TAG, "Event Added to the Database");
-				} else {
-					Log.v(TAG, "Event Already Finished");
 				}
 			}
-		}
 
-		lastSavedEventId = Math.max(maxId, lastSavedEventId);
-		return newEvents;
+			lastSavedEventId = Math.max(maxId, lastSavedEventId);
+			return newEvents;
+		} else {
+			return 0;
+		}
 	}
 
 	/**
 	 * Set the alarm for the poller getting the interval value from the
 	 * preferences
 	 */
-	public void setAlarmForPollerFromPreferences() {
+	public void setPollerAlarmFromPreferences() {
 		Log.d(TAG, "Updating poller alarm");
 		int minutes = getMinutesBetweenUpdates();
 		if (minutes >= 0)
@@ -256,11 +282,9 @@ OnSharedPreferenceChangeListener {
 
 	/**
 	 * Set the poller alarm
-	 * 
-	 * @param minutes
-	 *            the minutes between every launch
+	 * @param minutes the minutes between every launch
 	 */
-	private void setPollerAlarm(int minutes) {
+	public void setPollerAlarm(int minutes) {
 		if (minutes < 0)
 			return;
 
@@ -269,8 +293,10 @@ OnSharedPreferenceChangeListener {
 				getApplicationContext(), -1, intent,
 				PendingIntent.FLAG_UPDATE_CURRENT);
 
+		// Cancel the previous alarm
+		alarmManager.cancel(pollerTriggerPendingIntent);
+
 		if (minutes == ALARM_DISABLED) {
-			alarmManager.cancel(pollerTriggerPendingIntent);
 			Log.v(TAG, "Automatic updates disabled");
 		} else {
 			// set the alarm (it could be approximately).
@@ -450,18 +476,20 @@ OnSharedPreferenceChangeListener {
 			if (eventsDeleted > 0) {
 				Log.d(TAG, "Event deleted from the database");
 				new DeleteEventOnSpreadsheet().execute(arrayId);
-				Toast.makeText(this, "Event deleted.", Toast.LENGTH_LONG).show();
+				Toast.makeText(this, getText(R.string.toastEventDeleted),
+						Toast.LENGTH_LONG).show();
 				return true;
 			}
 
 			Log.w(TAG, "Problems deleting the event in the database");
 			Toast.makeText(this,
-					"Problems deleting the event in the database.",
+					getText(R.string.toastProblemsDeleting),
 					Toast.LENGTH_LONG).show();
 			return false;
 		}
-		Toast.makeText(this, "You are not the creator of the event.", Toast.LENGTH_LONG).show();
-		Log.d(TAG, "Deletion not allowed. " + currentUser + "!= " + creator);
+		Toast.makeText(this, getText(R.string.toastNotCreator),
+				Toast.LENGTH_LONG).show();
+		Log.d(TAG, "Deletion not allowed. " + currentUser + " != " + creator);
 		return false;
 	}
 
@@ -556,5 +584,60 @@ OnSharedPreferenceChangeListener {
 	 */
 	public CharSequence getDateTimeFormatted(Date datetime) {
 		return DateFormat.format("E, MMM dd yyyy - h:mmaa", datetime);
+	}
+
+	/**
+	 * Check if a connection is available to pass data
+	 * @return true if a connection is available, otherwise false
+	 */
+	public boolean checkConnectivity() {
+		NetworkInfo i = connectivityManager.getActiveNetworkInfo();
+
+		if (i == null)
+			return false;
+
+		if (!i.isConnected())
+			return false;
+
+		if (!i.isAvailable())
+			return false;
+
+		return true;
+	}
+
+	public String getEmail() {
+		return prefs.getString((String) getText(R.string.preferencesKeyCustomAccountMail), "");
+	}
+
+	public String getPassword() {
+		return prefs.getString((String) getText(R.string.preferencesKeyCustomAccountPassword), "");
+	}
+
+	public boolean getUseDefaultAccount() {
+		return prefs.getBoolean((String) getText(R.string.preferencesKeyDefaultAccount), false);
+	}
+
+	/**
+	 * Check the preferences for the login data and if the data are present do the login
+	 * @param forceNewLogin drop the current session and force a new one
+	 * @return true if the login data are present and now you are logged in, false otherwise.
+	 */
+	public boolean checkAccountAndLogin(boolean forceNewLogin) {
+		if ((spreadsheetFactory != null) && !forceNewLogin)
+			return true;
+
+		String email = getEmail();
+		String password = getPassword();
+		boolean useDefaultAccount = getUseDefaultAccount();
+
+		if ((useDefaultAccount == true) || (!email.isEmpty() && !password.isEmpty())) {
+			if (useDefaultAccount == true)
+				setDefaultAccount();
+			else
+				setAnotherAccount(email, password);
+
+			return true;
+		}
+		return false;
 	}
 }

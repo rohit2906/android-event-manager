@@ -20,42 +20,55 @@ public class PollerService extends IntentService {
 
 	public PollerService() {
 		super(TAG);
-		Log.d(TAG, TAG + " constructed");
+		Log.d(TAG, TAG + " created");
 	}
 
 	@Override
 	protected void onHandleIntent(Intent intent) {
 		Log.d(TAG, "onHandleIntent");
-		Intent newEventsIntent = null;
-
-		notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-		notification = new Notification(android.R.drawable.stat_sys_download_done, "", 0);		
 
 		EventManagerApp app = (EventManagerApp) getApplication();
-		int newEvents = app.parseEvents();
-		if (newEvents == 0) {
-			Log.d(TAG, "No new events");
-		} else if (newEvents > 0) {
-			Log.d(TAG, newEvents + " new events found.");
 
-			// Create the intent to broadcast
-			newEventsIntent = new Intent(NEW_EVENTS_INTENT);
-			newEventsIntent.putExtra(NEW_EVENTS_EXTRA_COUNT, newEvents);
+		// Check if the login data are set
+		if (app.checkAccountAndLogin(false)) {
 
-			// Create the notification
-			sendNewEventsNotificationToSystemBar(newEvents);
-		} else if (newEvents < 0) {
-			Log.w(TAG, "Impossible to get the spreadsheets. Have you set the account?");
+			// Check if the connectivity is available
+			if (app.checkConnectivity()) {		
+				Intent newEventsIntent = null;
 
-			// Create the intent to broadcast reporting the error (-1)
-			newEventsIntent = new Intent(NEW_EVENTS_INTENT);
-			newEventsIntent.putExtra(NEW_EVENTS_EXTRA_COUNT, -1);
-		}
+				notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+				notification = new Notification(android.R.drawable.stat_sys_download_done, "", 0);		
 
-		// Send the Broadcast
-		if (newEventsIntent != null) {
-			sendBroadcast(newEventsIntent, RECEIVE_EVENTS_NOTIFICATIONS);
-			Log.d(TAG, "newEventsIntent Broadcasted");
+				int newEvents = app.parseEvents();
+				if (newEvents == 0) {
+					Log.d(TAG, "No new events");
+				} else if (newEvents > 0) {
+					Log.d(TAG, newEvents + " new events found.");
+
+					// Create the intent to broadcast
+					newEventsIntent = new Intent(NEW_EVENTS_INTENT);
+					newEventsIntent.putExtra(NEW_EVENTS_EXTRA_COUNT, newEvents);
+
+					// Create the notification
+					sendNewEventsNotificationToSystemBar(newEvents);
+				} else if (newEvents < 0) {
+					Log.w(TAG, "Impossible to get the spreadsheets. Have you set the account?");
+
+					// Create the intent to broadcast reporting the error (-1)
+					newEventsIntent = new Intent(NEW_EVENTS_INTENT);
+					newEventsIntent.putExtra(NEW_EVENTS_EXTRA_COUNT, -1);
+				}
+
+				// Send the Broadcast
+				if (newEventsIntent != null) {
+					sendBroadcast(newEventsIntent, RECEIVE_EVENTS_NOTIFICATIONS);
+					Log.d(TAG, "newEventsIntent Broadcasted");
+				}
+			} else {
+				Log.d(TAG, "Connectivity not available");
+			}
+		} else {
+			Log.d(TAG, "Login Data not available");
 		}
 	}
 
@@ -67,31 +80,35 @@ public class PollerService extends IntentService {
 	private void sendNewEventsNotificationToSystemBar(int newEventsCount) {
 		Log.d(TAG, "sendNewEventsNotificationToSystemBar");
 		
+		EventManagerApp app = (EventManagerApp) getApplication();
+
 		// Create an intent that will lead us to the EventsActivity when the user
 		// clicks on the notification
 		PendingIntent pendingIntent = PendingIntent.getActivity(this, -1,
 				new Intent(this, EventsActivity.class),
 				PendingIntent.FLAG_UPDATE_CURRENT);
-		
+
 		// Set the time shown on the notification
 		notification.when = System.currentTimeMillis();
-		
+
 		// Cancel this notification as soon as the user clicks on it
 		notification.flags |= Notification.FLAG_AUTO_CANCEL;
-		
+
 		// Adding a couple of extra features :)
-		notification.defaults |= Notification.DEFAULT_SOUND;
-		notification.defaults |= Notification.DEFAULT_VIBRATE;
-		
+		if (app.getNotificationSound())
+			notification.defaults |= Notification.DEFAULT_SOUND;
+		if (app.getNotificationVibration())
+			notification.defaults |= Notification.DEFAULT_VIBRATE;
+
 		// Set the title and the summary
 		CharSequence notificationTitle = getText(R.string.notificationTitle);
 		CharSequence notificationSummary = createNotificationSummaryString(newEventsCount);
-		
+
 		// Set the information in the notification
 		notification.setLatestEventInfo(this, notificationTitle, notificationSummary, pendingIntent);
 		notificationManager.notify(0, notification);
 	}
-	
+
 	/**
 	 * Create the notification summary text based on the number of new events
 	 * 
