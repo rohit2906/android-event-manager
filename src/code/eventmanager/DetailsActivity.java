@@ -3,6 +3,8 @@ package code.eventmanager;
 import java.util.Date;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -12,8 +14,9 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
-public class DetailsEventActivity extends Activity implements OnClickListener {
+public class DetailsActivity extends Activity implements OnClickListener {
 
 	private static final String TAG = NewEventActivity.class.getSimpleName();
 
@@ -99,18 +102,37 @@ public class DetailsEventActivity extends Activity implements OnClickListener {
 			break;
 
 		case R.id.detailseventButtonDelete:
-			if (app.deleteEvent((int) eventId)) {
-				Log.d(TAG, "event deleted");
-				
-				// Set the return code of the activity
-				setResult(RESULT_EVENT_DELETED);
-				
-				// Update the widget
-				sendBroadcast(new Intent(EventManagerWidget.REFRESH_WIDGET));
-				
-				// Close the activity
-				finish();
-			}
+			AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+			alertDialog.setMessage(getText(R.string.alertDialogDeleteConfirmation));
+			alertDialog.setCancelable(true);
+			
+			alertDialog.setPositiveButton(getText(R.string.yes), new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int id) {
+					if (app.deleteEvent((int) eventId)) {
+						Log.d(TAG, "event deleted");
+						
+						// Set the return code of the activity
+						setResult(RESULT_EVENT_DELETED);
+						
+						// Update the widget
+						sendBroadcast(new Intent(EventManagerWidget.REFRESH_WIDGET));
+						
+						// Close the activity
+						finish();
+					} else {
+						Toast.makeText(getApplicationContext(), getText(R.string.eventsToastProblemDeleting),
+								Toast.LENGTH_LONG).show();
+					}
+				}
+			});
+			
+			alertDialog.setNegativeButton(getText(R.string.no), new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int id) {
+					dialog.cancel();
+				}
+			});
+			
+			alertDialog.show();
 			break;
 		}
 	}

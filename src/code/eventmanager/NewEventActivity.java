@@ -287,15 +287,17 @@ public class NewEventActivity extends Activity implements OnClickListener {
 
 			// check the data validity
 			if (dataName.isEmpty()) {
-				Toast.makeText(this, "Insert the Title", Toast.LENGTH_SHORT).show();
+				Toast.makeText(this, getText(R.string.newEventToastMissingTitle),
+						Toast.LENGTH_SHORT).show();
 			}else if (starting.before(new Date())) {
-				Toast.makeText(this, "The Starting Time is already passed", Toast.LENGTH_LONG).show();
+				Toast.makeText(this, getText(R.string.newEventToastStartingTimePassed),
+						Toast.LENGTH_LONG).show();
 			} else if (ending.before(starting)) {
-				Toast.makeText(this, "The Ending Date is before the Starting Date", Toast.LENGTH_LONG).show();
+				Toast.makeText(this, getText(R.string.newEventToastEndingBeforeStarting),
+						Toast.LENGTH_LONG).show();
 			} else if (dataAddress.isEmpty()) {
-				Toast.makeText(this, "Insert the Address", Toast.LENGTH_SHORT).show();
-			} else if (dataDescription.isEmpty()) {
-				Toast.makeText(this, "Insert the Description", Toast.LENGTH_SHORT).show();
+				Toast.makeText(this, getText(R.string.newEventToastMissingAddress),
+						Toast.LENGTH_SHORT).show();
 			} else {			
 				// open the database
 				SQLiteDatabase db = app.getDbHelper().getWritableDatabase();
@@ -339,8 +341,7 @@ public class NewEventActivity extends Activity implements OnClickListener {
 						// Update the last Saved Id to prevent notification
 						// of this event on your own mobile phone
 						app.setLastSavedEventsId(max);
-
-						//set the result for creating the toast when the activity finish
+						
 						Log.d(TAG, String.format(
 								"Event Created:ID=?\n?Name=?\nAddress=?\nDescription=?\nCreator=?\nStarting=?\nEnding=?\n",
 								(Object[]) entry));
@@ -367,7 +368,8 @@ public class NewEventActivity extends Activity implements OnClickListener {
 					
 					// Problem saving record
 					Log.w(TAG, "Problem saving record.");
-					Toast.makeText(NewEventActivity.this, "Problem creating the event. Retry", Toast.LENGTH_LONG);
+					Toast.makeText(NewEventActivity.this, getText(R.string.toastProblemsCreating),
+							Toast.LENGTH_LONG);
 				}
 			}
 

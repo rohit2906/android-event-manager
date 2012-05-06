@@ -44,7 +44,7 @@ public class LoginActivity extends Activity implements OnClickListener {
 		Log.i(TAG, "onClick");
 		switch (v.getId()) {
 		case R.id.loginBtnLogin:
-			Log.d(TAG, "loginBtnLogin onClick()");
+			Log.d(TAG, "loginBtnLogin onClick");
 			Editor editor = app.getPrefs().edit();
 			editor.putBoolean(
 					(String) getText(R.string.preferencesKeyDefaultAccount), true);
@@ -54,7 +54,7 @@ public class LoginActivity extends Activity implements OnClickListener {
 			break;
 
 		case R.id.loginBtnOtherAccount:
-			Log.d(TAG, "loginBtnOtherAccount onClick()");
+			Log.d(TAG, "loginBtnOtherAccount onClick");
 			startActivity(new Intent(this, CredentialsActivity.class));
 			finish();
 			break;
