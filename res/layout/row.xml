@@ -12,7 +12,7 @@
             android:id="@+id/rowName"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight="0.5"
             android:text="@string/rowNameText"
             android:textStyle="bold"/>
 

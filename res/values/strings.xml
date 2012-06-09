@@ -3,6 +3,9 @@
     
     <string name="eventManagerTitle">Event Manager</string>
     
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    
     <string name="loginTitle">Login</string>
     <string name="loginBtnLoginText">Login with your Google account</string>
     <string name="loginBtnOtherAccountText">Login using another Google account</string>
@@ -12,6 +15,8 @@
     <string name="credentialsTvUsernameText">Google e-mail</string>
     <string name="credentialsTvPasswordText">Password</string>
     <string name="credentialsBtnLoginText">Login</string>
+    <string name="credentialsToastMissingUsername">Write your Google email</string>
+    <string name="credentialsToastMissingPassword">Write your Password</string>
     
     <string name="neweventTitle">New Event</string>
     <string name="neweventTextViewNewEventText">New Event</string>
@@ -19,19 +24,38 @@
     <string name="neweventTextViewStartingText">Starting</string>
     <string name="neweventTextViewEndingText">Ending</string>
     <string name="neweventButtonCreateText">Create</string>
-    <string name="menuItemNewEventText">New Event</string>
     <string name="neweventButtonCancelText">Cancel</string>
     <string name="neweventTextViewDescriptionText">Description</string>
     <string name="neweventTextViewAddressText">Address</string>
+    <string name="newEventToastMissingTitle">Insert the Title</string>
+    <string name="newEventToastStartingTimePassed">The Starting Time is already passed</string>
+    <string name="newEventToastEndingBeforeStarting">The Ending Date is before the Starting Date</string>
+    <string name="newEventToastMissingAddress">Insert the Address</string>
     
     <string name="eventsTitle">Events</string>
     <string name="eventsTitleText">Events</string>
     <string name="eventsButtonNewEventText">New Event</string>
+    <string name="eventsToastImpossibleGetSpreadsheet">Impossible to get the spreadsheet. Have you set the account?</string>
+    <string name="eventsToastProblemDeleting">Problem deleting the event. Are you the creator?</string>
+    
+    <string name="detailseventTitle">Details</string>
+    <string name="detailseventButtonReturnText">OK</string>
+    <string name="detailseventButtonDeleteText">Delete</string>
+    <string name="detailseventTextViewTitleText">Title</string>
+    <string name="detailseventTextViewStartingText">Starting</string>
+    <string name="detailseventTextViewEndingText">Ending</string>
+    <string name="detailseventTextViewAddressText">Address</string>
+    <string name="detailseventTextViewDescriptionText">Description</string>
     
     <string name="menuItemPreferencesText">Preferences</string>
     <string name="menuItemSyncNowText">Sync Now</string>
+    <string name="menuItemNewEventText">New Event</string>
     
     <string name="preferencesTitle">Preferences</string>
+    <string name="preferencesCategoryAccount">Google Account</string>
+    <string name="preferencesCategoryUpdates">Updates</string>
+    <string name="preferencesCategoryEvents">Events</string>
+    <string name="preferencesCategoryNotifications">Notifications</string>
     <string name="preferencesKeyMinutesBetweenUpdates">minutesBetweenUpdates</string>
     <string name="preferencesKeyDefaultAccount">useDefaultAccount</string>
     <string name="preferencesUseDefaultAccountText">Default Google Account</string>
@@ -53,12 +77,20 @@
     <string name="preferencesKeyLocationProvider">locationProvider</string>
     <string name="preferencesLocationProviderText">Location Provider</string>
     <string name="preferencesLocationProviderSummary">Do you want to suggest your address when you are creating a new event?</string>
+    <string name="preferencesKeyNotificationSound">notificationSound</string>
+    <string name="preferencesNotificationSoundText">Sound</string>
+    <string name="preferencesNotificationSoundSummary">Play the notification sound when you receive an event update</string>
+    <string name="preferencesKeyNotificationVibration">notificationVibration</string>
+    <string name="preferencesNotificationVibrationText">Vibration</string>
+    <string name="preferencesNotificationVibrationSummary">Vibrate when you receive an event update</string>
+    
     
     <string name="pollerTitle">PollerService</string>
     
     <string name="eventProviderTitle">EventProvider</string>
     
     <string name="eventManagerWidgetTitle">Event Manager Widget</string>
+    <string name="eventManagerWidgetNoEvents">No upcoming events</string>
     
     <string name="permissionSendEventsNotificationsLabel">Sends Events Notifications</string>
     <string name="permissionSendEventsNotificationsDescription">Allow this application to send events
@@ -70,17 +102,15 @@
     <string name="notificationTitle">Event Manager</string>
     <string name="notificationMessage" formatted="false">You received %d new event invitation%s!</string>
     
+    <string name="toastEventDeleted">Event deleted</string>
+    <string name="toastEventCreated">Event created</string>    
+    <string name="toastProblemsDeleting">Problems deleting the event in the database</string>
+    <string name="toastProblemsCreating">Problems with the creation of the event. Try again.</string>
+    <string name="toastNotCreator">You are not the creator of the event</string>
+    <string name="alertDialogDeleteConfirmation">Are you sure you want to delete it?</string>
+    
     <string name="rowNameText">Event Name</string>
     <string name="rowStartingTimeText">starting time</string>
     <string name="rowAddressText">Address</string>
-    
-    <string name="detailseventTitle">Details</string>
-    <string name="detailseventButtonReturnText">OK</string>
-    <string name="detailseventButtonDeleteText">Delete</string>
-    <string name="detailseventTextViewTitleText">Title</string>
-    <string name="detailseventTextViewStartingText">Starting</string>
-    <string name="detailseventTextViewEndingText">Ending</string>
-    <string name="detailseventTextViewAddressText">Address</string>
-    <string name="detailseventTextViewDescriptionText">Description</string>
 
 </resources>

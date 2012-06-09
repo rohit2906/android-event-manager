@@ -1,56 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
-
-    <CheckBoxPreference
-        android:disableDependentsState="true"
-        android:enabled="true"
-        android:key="@string/preferencesKeyDefaultAccount"
-        android:summary="@string/preferencesUseDefaultAccountSummary"
-        android:title="@string/preferencesUseDefaultAccountText" />
-
-    <EditTextPreference
-        android:dependency="@string/preferencesKeyDefaultAccount"
-        android:key="@string/preferencesKeyCustomAccountMail"
-        android:summary="@string/preferencesOtherAccountEmailSummary"
-        android:title="@string/preferencesOtherAccountEmailText" >
-    </EditTextPreference>
     
-    <EditTextPreference
-        android:dependency="@string/preferencesKeyDefaultAccount"
-        android:password="true"
-        android:key="@string/preferencesKeyCustomAccountPassword"
-        android:summary="@string/preferencesOtherAccountPasswordSummary"
-        android:title="@string/preferencesOtherAccountPasswordText" >
-    </EditTextPreference>
+    <PreferenceCategory 
+        android:title="@string/preferencesCategoryAccount">
+        
+        <CheckBoxPreference
+        	android:disableDependentsState="true"
+        	android:enabled="true"
+        	android:key="@string/preferencesKeyDefaultAccount"
+        	android:summary="@string/preferencesUseDefaultAccountSummary"
+        	android:title="@string/preferencesUseDefaultAccountText" />
 
-    <ListPreference
-        android:defaultValue="1"
-        android:entries="@array/minutesBetweenUpdatesStringsArray"
-        android:entryValues="@array/minutesBetweenUpdatesValuesArray"
-        android:key="@string/preferencesKeyMinutesBetweenUpdates"
-        android:summary="@string/preferencesMinutesBetweenUpdatesSummary"
-        android:title="@string/preferencesMinutesBetweenUpdatesText" />
-
-    <EditTextPreference
-        android:defaultValue="event_manager"
-        android:key="@string/preferencesKeySpreadsheetTitle"
-        android:summary="@string/preferencesSpreadsheetTitleText"
-        android:title="@string/preferencesSpreadsheetTitleSummary" >
-    </EditTextPreference>
+    	<EditTextPreference
+        	android:dependency="@string/preferencesKeyDefaultAccount"
+        	android:key="@string/preferencesKeyCustomAccountMail"
+        	android:summary="@string/preferencesOtherAccountEmailSummary"
+        	android:title="@string/preferencesOtherAccountEmailText" />
     
-    <CheckBoxPreference
-        android:enabled="true"
-        android:defaultValue="true"
-        android:key="@string/preferencesKeyStartOnBoot"
-        android:summary="@string/preferencesStartOnBootSummary"
-        android:title="@string/preferencesStartOnBootText" />
+    	<EditTextPreference
+        	android:dependency="@string/preferencesKeyDefaultAccount"
+        	android:password="true"
+        	android:key="@string/preferencesKeyCustomAccountPassword"
+        	android:summary="@string/preferencesOtherAccountPasswordSummary"
+        	android:title="@string/preferencesOtherAccountPasswordText" />
+        
+    </PreferenceCategory>
     
-   	<ListPreference
-   	    android:defaultValue="network"
-   	    android:key="@string/preferencesKeyLocationProvider"
-   	    android:entries="@array/locationProvidersStringsArray"
-   	    android:entryValues="@array/locationProvidersValuesArray"
-   	    android:title="@string/preferencesLocationProviderText"
-    	android:summary="@string/preferencesLocationProviderSummary" />
-
+    <PreferenceCategory 
+        android:title="@string/preferencesCategoryUpdates">
+        
+        <ListPreference
+        	android:defaultValue="1"
+        	android:entries="@array/minutesBetweenUpdatesStringsArray"
+        	android:entryValues="@array/minutesBetweenUpdatesValuesArray"
+        	android:key="@string/preferencesKeyMinutesBetweenUpdates"
+        	android:summary="@string/preferencesMinutesBetweenUpdatesSummary"
+        	android:title="@string/preferencesMinutesBetweenUpdatesText" />
+        
+        <CheckBoxPreference
+        	android:enabled="true"
+        	android:defaultValue="true"
+        	android:key="@string/preferencesKeyStartOnBoot"
+        	android:summary="@string/preferencesStartOnBootSummary"
+        	android:title="@string/preferencesStartOnBootText" />
+        
+    </PreferenceCategory>
+    
+    <PreferenceCategory 
+        android:title="@string/preferencesCategoryEvents">
+        
+        <ListPreference
+   	    	android:defaultValue="network"
+   	    	android:key="@string/preferencesKeyLocationProvider"
+   	    	android:entries="@array/locationProvidersStringsArray"
+   	    	android:entryValues="@array/locationProvidersValuesArray"
+   	    	android:title="@string/preferencesLocationProviderText"
+    		android:summary="@string/preferencesLocationProviderSummary" />
+        
+        <EditTextPreference
+        	android:defaultValue="event_manager"
+        	android:key="@string/preferencesKeySpreadsheetTitle"
+        	android:summary="@string/preferencesSpreadsheetTitleText"
+        	android:title="@string/preferencesSpreadsheetTitleSummary" />
+        
+    </PreferenceCategory>
+    
+    <PreferenceCategory 
+        android:title="@string/preferencesCategoryNotifications">
+        
+        <CheckBoxPreference
+        	android:enabled="true"
+        	android:key="@string/preferencesKeyNotificationSound"
+        	android:summary="@string/preferencesNotificationSoundSummary"
+        	android:title="@string/preferencesNotificationSoundText" />
+        
+        <CheckBoxPreference
+        	android:enabled="true"
+        	android:key="@string/preferencesKeyNotificationVibration"
+        	android:summary="@string/preferencesNotificationVibrationSummary"
+        	android:title="@string/preferencesNotificationVibrationText" />
+        
+    </PreferenceCategory>
+    
 </PreferenceScreen>
