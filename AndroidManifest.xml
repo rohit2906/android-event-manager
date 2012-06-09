@@ -27,6 +27,10 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     
     <application android:name=".EventManagerApp" android:icon="@drawable/ic_launcher"
         android:label="@string/eventManagerTitle" >
@@ -43,9 +47,21 @@
         <activity android:name=".PreferencesActivity" android:label="@string/preferencesTitle" />
         <activity android:name=".EventsActivity" android:label="@string/eventsTitle" android:launchMode="singleTop" />
         <activity android:name=".NewEventActivity" android:label="@string/neweventTitle" android:launchMode="singleTop" android:windowSoftInputMode="stateVisible|adjustPan" />
-        <activity android:name=".DetailsEventActivity" android:label="@string/detailseventTitle" android:launchMode="singleTop" />
+        <activity android:name=".DetailsActivity" android:label="@string/detailseventTitle" android:launchMode="singleTop" />
 
         <service android:name=".PollerService" android:label="@string/pollerTitle" />
+        
+        <receiver android:name=".BootReceiver">
+        	<intent-filter>
+				<action android:name="android.intent.action.BOOT_COMPLETED" />
+			</intent-filter>
+		</receiver>
+		
+        <receiver android:name=".NetworkReceiver">
+			<intent-filter>
+				<action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+			</intent-filter>
+		</receiver>
         
         <provider android:name=".EventProvider" android:label="@string/eventProviderTitle" android:authorities="code.eventmanager.eventprovider" />
         
